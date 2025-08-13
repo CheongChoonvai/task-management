@@ -23,12 +23,57 @@ export default function CustomAuth({ onSuccess }: CustomAuthProps) {
   // Simple email change handler
   const handleEmailChange = (newEmail: string) => {
     setEmail(newEmail)
+    // Clear any previous error messages when user changes email
+    if (message.toLowerCase().includes('invalid')) {
+      setMessage('')
+    }
+  }
+
+  // Basic email validation
+  const isValidEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  const resendConfirmation = async () => {
+    if (!email) {
+      setMessage('Please enter your email address first.');
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent('/dashboard')}`
+        }
+      });
+      
+      if (error) {
+        setMessage(`Error resending email: ${error.message}`);
+      } else {
+        setMessage('Confirmation email sent! Please check your email (including spam folder).');
+      }
+    } catch (error: any) {
+      setMessage(`Error: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setMessage('')
+
+    // Basic email validation before submitting
+    if (!isValidEmail(email)) {
+      setMessage('Please enter a valid email address. Make sure it contains @ and a domain (e.g., user@example.com).');
+      setLoading(false);
+      return;
+    }
 
     try {
       if (view === 'sign_in') {
@@ -39,36 +84,28 @@ export default function CustomAuth({ onSuccess }: CustomAuthProps) {
         if (error) throw error
         setMessage('Sign in successful!')
       } else {
-        // Check if user already exists by attempting a password reset
-        const { error: checkError } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/login`
-        });
-        if (!checkError) {
-          setMessage('User already exists');
-          return;
-        }
-        const checkMsg = checkError.message?.toLowerCase() || '';
-        if (!checkMsg.includes('user not found') && !checkMsg.includes('email not found')) {
-          setMessage('User already exists');
-          return;
-        }
-
-        // If user does not exist, proceed to sign up
-        const { error } = await supabase.auth.signUp({
+        // Clean signup process
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/login`,
+            emailRedirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent('/dashboard')}`,
             data: {
               full_name: fullName || null
             }
           }
         });
-        if (error) throw error;
-        setMessage('Account created! Please sign in.');
-        setTimeout(() => {
-          window.location.href = '/login';
-        }, 1500);
+        
+        if (error) {
+          if (error.message.toLowerCase().includes('user already registered')) {
+            setMessage('An account with this email already exists. Please sign in or use the "Resend Confirmation Email" button if you haven\'t confirmed your email yet.');
+          } else {
+            setMessage(`Signup failed: ${error.message}`);
+          }
+        } else {
+          setMessage('Account created successfully! Please check your email to confirm your account.');
+          setView('sign_in');
+        }
       }
     } catch (error: any) {
       setMessage(error.message)
@@ -105,8 +142,7 @@ export default function CustomAuth({ onSuccess }: CustomAuthProps) {
         </button>
       </div>
 
-      {/* Auto-detection message */}
-  {/* Removed auto-detection message */}
+
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -229,6 +265,17 @@ export default function CustomAuth({ onSuccess }: CustomAuthProps) {
             : 'bg-red-50 text-red-800 border border-red-200'
         }`}>
           <p className="text-sm">{message}</p>
+          {/* Show resend button for confirmation-related messages */}
+          {(message.includes('check your email') || message.includes('already exists')) && (
+            <button
+              type="button"
+              onClick={resendConfirmation}
+              disabled={loading}
+              className="mt-2 text-xs bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 disabled:opacity-50"
+            >
+              {loading ? 'Sending...' : 'Resend Confirmation Email'}
+            </button>
+          )}
         </div>
       )}
 

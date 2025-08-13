@@ -2,8 +2,13 @@
 
 import Link from 'next/link'
 import { AlertCircle, ArrowLeft } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
 
 export default function AuthCodeErrorPage() {
+  const searchParams = useSearchParams()
+  const error = searchParams?.get('error')
+  const description = searchParams?.get('description')
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
@@ -33,21 +38,23 @@ export default function AuthCodeErrorPage() {
               <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
               <div>
                 <h3 className="text-sm font-semibold text-red-800 mb-2">
-                  Link Invalid or Expired
+                  {error ? `Authentication Error: ${error}` : 'Link Invalid or Expired'}
                 </h3>
                 <p className="text-sm text-red-700 mb-4">
-                  The authentication link you clicked is either invalid, expired, or has already been used.
+                  {description ? description : 'The authentication link you clicked is either invalid, expired, or has already been used.'}
                 </p>
                 
-                <div className="text-sm text-red-700">
-                  <p className="font-medium mb-2">Possible reasons:</p>
-                  <ul className="list-disc list-inside space-y-1 text-red-600">
-                    <li>The link has expired (links are valid for limited time)</li>
-                    <li>The link has already been used</li>
-                    <li>The link was copied incorrectly</li>
-                    <li>There was a network issue during authentication</li>
-                  </ul>
-                </div>
+                {!error && (
+                  <div className="text-sm text-red-700">
+                    <p className="font-medium mb-2">Possible reasons:</p>
+                    <ul className="list-disc list-inside space-y-1 text-red-600">
+                      <li>The link has expired (links are valid for limited time)</li>
+                      <li>The link has already been used</li>
+                      <li>The link was copied incorrectly</li>
+                      <li>There was a network issue during authentication</li>
+                    </ul>
+                  </div>
+                )}
               </div>
             </div>
           </div>
