@@ -17,7 +17,7 @@ const projectSchema = z.object({
   priority: z.enum(['low', 'medium', 'high']),
   deadline: z.string().optional(),
   lead_id: z.string().optional(),
-  members: z.array(z.string()).min(1, 'Select at least one member'),
+  members: z.array(z.string()),
 })
 
 type ProjectForm = z.infer<typeof projectSchema>
@@ -43,11 +43,13 @@ export default function CreateProjectPage() {
   } = useForm<ProjectForm>({
     resolver: zodResolver(projectSchema),
     defaultValues: {
-      status: 'planning',
-      priority: 'medium',
+      status: 'planning' as const,
+      priority: 'medium' as const,
       members: [],
     },
   })
+
+  const selectedLeadId = watch('lead_id')
 
   useEffect(() => {
     if (user) {
@@ -109,12 +111,27 @@ export default function CreateProjectPage() {
 
       // Insert project_members records for each selected member
       const projectId = projectResult?.id;
-      if (projectId && data.members.length > 0) {
-        const memberRows = data.members.map(memberId => ({ project_id: projectId, member_id: memberId }));
-        const { error: pmError } = await supabase
-          .from('project_members')
-          .insert(memberRows);
-        if (pmError) throw pmError;
+      if (projectId) {
+        // Create a set of member IDs to ensure the lead is included
+        const memberIds = new Set(data.members || []);
+        
+        // Add the project lead to the members if they're not already included
+        if (leadId) {
+          memberIds.add(leadId);
+        }
+        
+        // Convert to array and create member rows
+        const memberRows = Array.from(memberIds).map(memberId => ({ 
+          project_id: projectId, 
+          member_id: memberId 
+        }));
+        
+        if (memberRows.length > 0) {
+          const { error: pmError } = await supabase
+            .from('project_members')
+            .insert(memberRows);
+          if (pmError) throw pmError;
+        }
       }
 
       router.push('/projects')
@@ -275,8 +292,15 @@ export default function CreateProjectPage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Project Members
               </label>
+              {selectedLeadId && (
+                <p className="text-xs text-gray-500 mb-2">
+                  * Project lead will be automatically added as a member
+                </p>
+              )}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {members.map((member) => (
+                {members
+                  .filter(member => member.id !== selectedLeadId) // Exclude the selected lead
+                  .map((member) => (
                   <label key={member.id} className="flex items-center space-x-2">
                     <input
                       type="checkbox"
@@ -288,6 +312,11 @@ export default function CreateProjectPage() {
                   </label>
                 ))}
               </div>
+              {selectedLeadId && members.filter(member => member.id !== selectedLeadId).length === 0 && (
+                <p className="text-xs text-gray-500 mt-2">
+                  All available members are either selected as lead or already included.
+                </p>
+              )}
               {errors.members && (
                 <p className="mt-1 text-sm text-red-600">{errors.members.message}</p>
               )}
