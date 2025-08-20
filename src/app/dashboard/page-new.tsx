@@ -1,10 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+export const dynamic = 'force-dynamic'
+
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/lib/supabase'
-import { Plus, LogOut, Clock, CheckCircle, Circle, AlertCircle, TrendingUp, User, Calendar, BarChart3 } from 'lucide-react'
+import { Plus, LogOut, Clock, CheckCircle, Circle, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 
 interface Task {
@@ -43,22 +45,9 @@ export default function DashboardPage() {
   const [tasks, setTasks] = useState<Task[]>([])
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
-  const [currentMember, setCurrentMember] = useState<any>(null)
+  const [currentMember, setCurrentMember] = useState<{ id: string; email: string; full_name?: string } | null>(null)
 
-  useEffect(() => {
-    if (user) {
-      fetchCurrentMember()
-    }
-  }, [user])
-
-  useEffect(() => {
-    if (currentMember) {
-      fetchTasks()
-      fetchProjects()
-    }
-  }, [currentMember])
-
-  const fetchCurrentMember = async () => {
+  const fetchCurrentMember = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('members')
@@ -89,9 +78,11 @@ export default function DashboardPage() {
     } catch (error) {
       console.error('Error fetching/creating current member:', error)
     }
-  }
+  }, [user])
 
-  const fetchTasks = async () => {
+  const fetchTasks = useCallback(async () => {
+    if (!currentMember) return
+    
     try {
       const { data, error } = await supabase
         .from('tasks')
@@ -109,9 +100,11 @@ export default function DashboardPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [currentMember])
 
-  const fetchProjects = async () => {
+  const fetchProjects = useCallback(async () => {
+    if (!currentMember) return
+    
     try {
       // Get projects where user is the lead
       const { data: projectsData, error: projectsError } = await supabase
@@ -145,11 +138,24 @@ export default function DashboardPage() {
     } catch (error) {
       console.error('Error fetching projects:', error)
     }
-  }
+  }, [currentMember])
+
+  useEffect(() => {
+    if (user) {
+      fetchCurrentMember()
+    }
+  }, [user, fetchCurrentMember])
+
+  useEffect(() => {
+    if (currentMember) {
+      fetchTasks()
+      fetchProjects()
+    }
+  }, [currentMember, fetchTasks, fetchProjects])
 
   const updateTaskStatus = async (taskId: string, newStatus: string) => {
     try {
-      const updates: any = { 
+      const updates: { status: string; updated_at: string; completed_at?: string; progress?: number } = { 
         status: newStatus, 
         updated_at: new Date().toISOString() 
       }

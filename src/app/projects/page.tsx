@@ -1,10 +1,12 @@
 'use client'
 
+export const dynamic = 'force-dynamic'
+
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/lib/supabase'
-import { Plus, Calendar, User, TrendingUp, DollarSign, Clock } from 'lucide-react'
+import { Plus, Calendar, User, TrendingUp, DollarSign } from 'lucide-react'
 import Link from 'next/link'
 
 interface Project {
@@ -24,8 +26,19 @@ interface Project {
     full_name: string | null
     email: string
   }
+  project_members?: ProjectMember[]
   tasks_count?: number
   completed_tasks?: number
+}
+
+interface ProjectMember {
+  id: string
+  member_id: string
+}
+
+interface Task {
+  id: string
+  status: string
 }
 
 export default function ProjectsPage() {
@@ -38,7 +51,7 @@ export default function ProjectsPage() {
     if (user && user.email) {
       fetchProjects()
     }
-  }, [user])
+  }, [user]) // Note: fetchProjects dependency warning will remain until we convert to useCallback
 
   const fetchProjects = async () => {
     try {
@@ -62,19 +75,19 @@ export default function ProjectsPage() {
       if (projectsError) throw projectsError;
 
       // Filter projects to only those where project_members includes current member
-      const filteredProjects = (projectsData || []).filter((project: any) =>
-        project.project_members?.some((pm: any) => pm.member_id === memberId)
+      const filteredProjects = (projectsData || []).filter((project: Project) =>
+        project.project_members?.some((pm: ProjectMember) => pm.member_id === memberId)
       );
 
       // Get task counts for each filtered project
       const projectsWithCounts = await Promise.all(
-        filteredProjects.map(async (project: any) => {
+        filteredProjects.map(async (project: Project) => {
           const { data: tasksData } = await supabase
             .from('tasks')
             .select('id, status')
             .eq('project_id', project.id);
           const tasks_count = tasksData?.length || 0;
-          const completed_tasks = tasksData?.filter((task: any) => task.status === 'completed').length || 0;
+          const completed_tasks = tasksData?.filter((task: Task) => task.status === 'completed').length || 0;
           return {
             ...project,
             tasks_count,

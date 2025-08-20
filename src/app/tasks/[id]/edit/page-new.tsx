@@ -42,6 +42,12 @@ interface Project {
   status: string
 }
 
+interface Member {
+  id: string
+  full_name: string | null
+  email: string
+}
+
 export default function EditTaskPage() {
   const { user } = useAuth()
   const router = useRouter()
@@ -50,7 +56,7 @@ export default function EditTaskPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [task, setTask] = useState<Task | null>(null)
   const [projects, setProjects] = useState<Project[]>([])
-  const [currentMember, setCurrentMember] = useState<any>(null)
+  const [currentMember, setCurrentMember] = useState<Member | null>(null)
   const [loading, setLoading] = useState(true)
 
   const {
@@ -110,6 +116,10 @@ export default function EditTaskPage() {
 
   const fetchTask = async () => {
     try {
+      if (!currentMember) {
+        throw new Error('No current member found')
+      }
+      
       const { data, error } = await supabase
         .from('tasks')
         .select('*')
@@ -143,7 +153,7 @@ export default function EditTaskPage() {
 
     setIsSubmitting(true)
     try {
-      const updates: any = {
+  const updates: Record<string, unknown> = {
         title: data.title,
         description: data.description || null,
         priority: data.priority,

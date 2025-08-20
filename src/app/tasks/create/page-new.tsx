@@ -1,5 +1,7 @@
 'use client'
 
+export const dynamic = 'force-dynamic'
+
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
@@ -7,7 +9,7 @@ import { supabase } from '@/lib/supabase'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { ArrowLeft, Calendar, User, TrendingUp } from 'lucide-react'
+import { ArrowLeft, Calendar, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 
 const taskSchema = z.object({
@@ -30,12 +32,18 @@ interface Project {
   status: string
 }
 
+interface Member {
+  id: string
+  full_name: string | null
+  email: string
+}
+
 export default function CreateTaskPage() {
   const { user } = useAuth()
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [projects, setProjects] = useState<Project[]>([])
-  const [currentMember, setCurrentMember] = useState<any>(null)
+  const [currentMember, setCurrentMember] = useState<Member | null>(null)
 
   const {
     register,

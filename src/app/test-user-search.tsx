@@ -2,9 +2,15 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 
+interface User {
+  id: string
+  full_name: string | null
+  email: string
+}
+
 export default function TestUserSearch() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

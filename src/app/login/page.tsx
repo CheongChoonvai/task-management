@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
-import { CheckCircle, ArrowLeft, Shield, Zap, Users } from 'lucide-react'
+import { CheckCircle, ArrowLeft, Zap, Users } from 'lucide-react'
 import Link from 'next/link'
 import CustomAuth from '@/components/CustomAuth'
 

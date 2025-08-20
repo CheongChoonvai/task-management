@@ -42,6 +42,12 @@ interface Project {
   status: string
 }
 
+interface Member {
+  id: string
+  full_name: string | null
+  email: string
+}
+
 export default function EditTaskPage() {
   const { user } = useAuth()
   const router = useRouter()
@@ -50,7 +56,7 @@ export default function EditTaskPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [task, setTask] = useState<Task | null>(null)
   const [projects, setProjects] = useState<Project[]>([])
-  const [currentMember, setCurrentMember] = useState<any>(null)
+  const [currentMember, setCurrentMember] = useState<Member | null>(null)
   const [loading, setLoading] = useState(true)
   const [isAssigned, setIsAssigned] = useState(false)
 
@@ -142,6 +148,11 @@ export default function EditTaskPage() {
   // Check if current member is assigned to this task
   const checkAssignment = async () => {
     try {
+      if (!currentMember) {
+        setIsAssigned(false)
+        return
+      }
+      
       const { data, error } = await supabase
         .from('task_assign')
         .select('member_id')
@@ -159,7 +170,7 @@ export default function EditTaskPage() {
 
     setIsSubmitting(true)
     try {
-      const updates: any = {
+  const updates: Record<string, unknown> = {
         title: data.title,
         description: data.description || null,
         priority: data.priority,

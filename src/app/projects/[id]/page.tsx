@@ -1,12 +1,14 @@
 'use client'
 
+export const dynamic = 'force-dynamic'
+
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase, updateProjectProgress } from '@/lib/supabase'
-import { ArrowLeft, Calendar, User, TrendingUp, DollarSign, Plus, CheckCircle, Circle, Clock, RefreshCw } from 'lucide-react'
+import { ArrowLeft, Calendar, User, TrendingUp, DollarSign, Plus, Circle, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
-import { getDisplayName, formatDate, getStatusStyles, getPriorityStyles } from '@/lib/utils'
+import { getDisplayName, getStatusStyles, getPriorityStyles } from '@/lib/utils'
 
 interface Project {
   id: string
@@ -45,6 +47,17 @@ interface Task {
   }
 }
 
+interface Member {
+  id: string
+  full_name: string | null
+  email: string
+}
+
+interface TaskAssignment {
+  task_id: string
+  member_id: string
+}
+
 export default function ProjectDetailPage() {
   const { user } = useAuth()
   const router = useRouter()
@@ -54,7 +67,7 @@ export default function ProjectDetailPage() {
   const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
-  const [currentMember, setCurrentMember] = useState<any>(null)
+  const [currentMember, setCurrentMember] = useState<Member | null>(null)
   const [taskAssignments, setTaskAssignments] = useState<Record<string, string[]>>({})
 
   useEffect(() => {
@@ -100,7 +113,7 @@ export default function ProjectDetailPage() {
         .in('task_id', tasks.map(t => t.id))
       if (error) throw error
       const assignments: Record<string, string[]> = {};
-      (data || []).forEach((row: any) => {
+      (data || []).forEach((row: TaskAssignment) => {
         if (!assignments[row.task_id]) assignments[row.task_id] = [];
         assignments[row.task_id].push(row.member_id);
       });
@@ -120,8 +133,8 @@ export default function ProjectDetailPage() {
           *,
           lead:members!projects_lead_id_fkey(full_name, email)
         `)
-        .eq('id', projectId)
-        .single()
+  .eq('id', projectId)
+  .single()
 
       if (error) throw error
       setProject(data)
@@ -167,7 +180,7 @@ export default function ProjectDetailPage() {
 
   const updateTaskStatus = async (taskId: string, newStatus: string) => {
     try {
-      const updates: any = { 
+      const updates: Record<string, unknown> = { 
         status: newStatus, 
         updated_at: new Date().toISOString() 
       }
@@ -377,7 +390,7 @@ export default function ProjectDetailPage() {
                 {task.status === 'completed' ? (
                   <span className="text-sm font-jura font-medium text-green-600 bg-green-100 px-3 py-1 rounded-full">Completed</span>
                 ) : (
-                  (taskAssignments[task.id]?.includes(currentMember?.id)) ? (
+                  (taskAssignments[task.id]?.includes(currentMember?.id || '')) ? (
                     <button
                       onClick={() => updateTaskStatus(task.id, 'completed')}
                       className="text-sm font-jura font-medium text-primary-600 bg-primary-100 hover:bg-primary-200 px-3 py-1 rounded-full transition-colors"

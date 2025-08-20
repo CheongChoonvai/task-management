@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { ArrowLeft, Mail, CheckCircle, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
@@ -11,7 +10,6 @@ export default function ResetPasswordPage() {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [isSuccess, setIsSuccess] = useState(false)
-  const router = useRouter()
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -69,7 +67,7 @@ export default function ResetPasswordPage() {
               Reset Password
             </h2>
             <p className="text-gray-600">
-              Enter your email address and we'll send you a link to reset your password
+              Enter your email address and we&apos;ll send you a link to reset your password
             </p>
           </div>
 
@@ -136,10 +134,10 @@ export default function ResetPasswordPage() {
                     Check Your Email
                   </h3>
                   <p className="text-gray-600 mb-4">
-                    We've sent a password reset link to <strong>{email}</strong>
+                    We&apos;ve sent a password reset link to <strong>{email}</strong>
                   </p>
                   <p className="text-sm text-gray-500">
-                    Didn't receive the email? Check your spam folder or try again.
+                    Didn&apos;t receive the email? Check your spam folder or try again.
                   </p>
                 </div>
 

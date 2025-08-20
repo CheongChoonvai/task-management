@@ -296,7 +296,7 @@ export default function CustomAuth({ onSuccess }: CustomAuthProps) {
       <div className="text-center text-sm text-gray-600">
         {view === 'sign_in' ? (
           <p className="font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <button
               type="button"
               onClick={() => setView('sign_up')}

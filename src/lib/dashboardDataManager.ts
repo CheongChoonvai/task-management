@@ -66,7 +66,7 @@ interface DashboardData {
 }
 
 class DashboardDataManager {
-  private cache = new Map<string, CacheEntry<any>>()
+  private cache = new Map<string, CacheEntry<unknown>>()
   private readonly CACHE_TTL = {
     member: 5 * 60 * 1000,      // 5 minutes
     tasks: 2 * 60 * 1000,       // 2 minutes
@@ -74,7 +74,7 @@ class DashboardDataManager {
     assignments: 2 * 60 * 1000, // 2 minutes
   }
 
-  private getCacheKey(type: string, params?: Record<string, any>): string {
+  private getCacheKey(type: string, params?: Record<string, string | number>): string {
     if (!params) return type
     const paramString = Object.keys(params)
       .sort()
@@ -104,14 +104,14 @@ class DashboardDataManager {
 
   private getCache<T>(key: string): T | null {
     // Check memory cache first
-    let entry = this.cache.get(key)
+    let entry = this.cache.get(key) as CacheEntry<T> | undefined
     
     // If not in memory, try localStorage
     if (!entry) {
       try {
         const stored = localStorage.getItem(`dashboard_cache_${key}`)
         if (stored) {
-          entry = JSON.parse(stored)
+          entry = JSON.parse(stored) as CacheEntry<T>
           // Restore to memory cache
           if (entry) this.cache.set(key, entry)
         }
@@ -210,14 +210,12 @@ class DashboardDataManager {
         currentMemberResult,
         projectsResult,
         tasksResult,
-        projectMembersResult,
-        taskAssignmentsResult
+        projectMembersResult
       ] = await Promise.all([
         supabase.from('members').select('*').eq('id', memberId).single(),
         this.getUserProjects(memberId),
         this.getUserTasks(memberId),
-        this.getProjectMembers(),
-        this.getTaskAssignments()
+        this.getProjectMembers()
       ])
 
       if (currentMemberResult.error) throw currentMemberResult.error
@@ -228,13 +226,13 @@ class DashboardDataManager {
       const projectMembers = projectMembersResult
 
       // Filter tasks based on project membership
-      const filteredTasks = tasks.filter((task: any) => {
+      const filteredTasks = tasks.filter((task: Task) => {
         if (!task.project_id) return true
         return projectMembers[task.project_id]?.includes(memberId)
       })
 
       // Enhance tasks with completion logic
-      const enhancedTasks = filteredTasks.map((task: any) => {
+      const enhancedTasks = filteredTasks.map((task: Task) => {
         const assignments = taskAssignments[task.id] || []
         const isAssigned = assignments.includes(memberId)
         const isCreator = task.created_by === memberId
@@ -301,14 +299,14 @@ class DashboardDataManager {
 
       // Get task counts for each project in parallel
       const projectsWithCounts = await Promise.all(
-        (projectsData || []).map(async (project: any) => {
+        (projectsData || []).map(async (project: Project) => {
           const { data: tasksData } = await supabase
             .from('tasks')
             .select('id, status')
             .eq('project_id', project.id)
 
           const tasks_count = tasksData?.length || 0
-          const completed_tasks = tasksData?.filter((task: any) => task.status === 'completed').length || 0
+          const completed_tasks = tasksData?.filter((task: { id: string; status: string }) => task.status === 'completed').length || 0
 
           return {
             ...project,
@@ -350,8 +348,8 @@ class DashboardDataManager {
       if (tasksError) throw tasksError
 
       // Fetch task assignments
-      const taskIds = (tasksData || []).map((t: any) => t.id)
-      let taskAssignments: Record<string, string[]> = {}
+      const taskIds = (tasksData || []).map((t: Task) => t.id)
+      const taskAssignments: Record<string, string[]> = {}
 
       if (taskIds.length > 0) {
         const { data: assignData } = await supabase
@@ -359,7 +357,7 @@ class DashboardDataManager {
           .select('task_id, member_id')
           .in('task_id', taskIds)
 
-        assignData?.forEach((row: any) => {
+        assignData?.forEach((row: { task_id: string; member_id: string }) => {
           if (!taskAssignments[row.task_id]) taskAssignments[row.task_id] = []
           taskAssignments[row.task_id].push(row.member_id)
         })
@@ -409,7 +407,7 @@ class DashboardDataManager {
         .select('task_id, member_id')
 
       const assignments: Record<string, string[]> = {}
-      data?.forEach((row: any) => {
+      data?.forEach((row: { task_id: string; member_id: string }) => {
         if (!assignments[row.task_id]) assignments[row.task_id] = []
         assignments[row.task_id].push(row.member_id)
       })

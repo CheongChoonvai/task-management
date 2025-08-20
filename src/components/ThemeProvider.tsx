@@ -29,7 +29,7 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
 
   // expose a simple API via window for quick toggling in dev (optional)
   useEffect(() => {
-    // @ts-ignore
+    // @ts-expect-error - Adding a development utility to global window object
     window.__setTheme = (t: Theme) => setTheme(t)
   }, [])
 

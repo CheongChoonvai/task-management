@@ -1,5 +1,7 @@
 'use client'
 
+export const dynamic = 'force-dynamic'
+
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
@@ -58,7 +60,7 @@ export default function DashboardPage() {
   }
 
   // Clear error state
-  const clearError = () => setError(null)
+  // clearError was previously used; removed to avoid unused-variable lint warnings
 
   // Load dashboard data using the optimized data manager
   const loadDashboardData = useCallback(async (forceRefresh = false) => {
@@ -66,7 +68,7 @@ export default function DashboardPage() {
 
     try {
       setLoading('initial', true)
-      clearError()
+      setError(null)
 
       if (forceRefresh) {
         dashboardDataManager.clearAllCache()
@@ -111,7 +113,7 @@ export default function DashboardPage() {
     setLoading('tasks', true)
     
     try {
-      const updates: any = { 
+      const updates: { status: string; updated_at: string; completed_at?: string; progress?: number } = { 
         status: newStatus, 
         updated_at: new Date().toISOString() 
       }
@@ -201,15 +203,6 @@ export default function DashboardPage() {
     router.push('/login')
   }
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'completed': return <CheckCircle className="w-5 h-5 text-green-500" />
-      case 'in_progress': return <Clock className="w-5 h-5 text-primary-500" />
-      default: return <Circle className="w-5 h-5 text-gray-400" />
-    }
-  }
-
-  const getPriorityColor = (priority: string) => getPriorityStyles(priority)
   const getStatusColor = (status: string) => getStatusStyles(status)
 
   // Derived state for better UX
@@ -485,7 +478,7 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <div className="space-y-3 max-h-96 overflow-y-auto custom-scrollbar">
-                  {tasks.slice(0, 10).map((task: Task, index) => (
+                  {tasks.slice(0, 10).map((task: Task) => (
                     <div key={task.id} className="group p-4 border border-gray-200 rounded-xl hover:bg-gradient-to-r hover:from-gray-50 hover:to-white hover:shadow-md transition-all duration-300 hover:border-primary-200">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4 flex-1 min-w-0">

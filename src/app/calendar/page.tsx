@@ -1,5 +1,7 @@
 'use client'
 
+export const dynamic = 'force-dynamic'
+
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
@@ -7,9 +9,9 @@ import { supabase } from '@/lib/supabase'
 import { Calendar, momentLocalizer, Event } from 'react-big-calendar'
 import moment from 'moment'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
-import { ArrowLeft, Calendar as CalendarIcon, Clock, TrendingUp, AlertCircle, Plus } from 'lucide-react'
+import { ArrowLeft, Calendar as CalendarIcon, AlertCircle, Plus } from 'lucide-react'
 import Link from 'next/link'
-import { getDisplayName, getStatusStyles, getPriorityStyles } from '@/lib/utils'
+import { getStatusStyles, getPriorityStyles } from '@/lib/utils'
 
 // Setup the localizer for react-big-calendar
 const localizer = momentLocalizer(moment)
@@ -58,7 +60,7 @@ interface CalendarState {
   events: CalendarEvent[]
   loading: boolean
   error: string | null
-  currentMember: any
+  currentMember: { id: string; email: string; full_name?: string } | null
 }
 
 export default function CalendarPage() {
@@ -325,7 +327,7 @@ export default function CalendarPage() {
     let borderColor = '#d4792f'
     
     if (event.type === 'task') {
-      const resource = event.resource as any
+      const resource = event.resource as { type: string; priority?: string }
       
       if (resource?.type === 'task-due') {
         if (event.priority === 'high') {
@@ -346,7 +348,7 @@ export default function CalendarPage() {
         borderColor = '#d4792f'
       }
     } else if (event.type === 'project') {
-      const resource = event.resource as any
+      const resource = event.resource as { type: string }
       
       if (resource?.type === 'project-deadline') {
         backgroundColor = '#7c3aed' // purple-600

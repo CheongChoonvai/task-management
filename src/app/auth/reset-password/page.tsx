@@ -1,10 +1,11 @@
 'use client'
 
+export const dynamic = 'force-dynamic'
+
 import { useState, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import { ArrowLeft, Lock, CheckCircle, AlertCircle, Eye, EyeOff } from 'lucide-react'
-import Link from 'next/link'
+import { Lock, CheckCircle, AlertCircle, Eye, EyeOff } from 'lucide-react'
 
 export default function ResetPasswordConfirmPage() {
   const [password, setPassword] = useState('')
@@ -16,7 +17,6 @@ export default function ResetPasswordConfirmPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   
   const router = useRouter()
-  const searchParams = useSearchParams()
 
   useEffect(() => {
     // Check if we have the session from the reset password email

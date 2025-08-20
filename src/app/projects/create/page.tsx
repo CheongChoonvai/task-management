@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabase'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { ArrowLeft, User, Calendar, DollarSign } from 'lucide-react'
+import { ArrowLeft, User, Calendar } from 'lucide-react'
 import Link from 'next/link'
 
 const projectSchema = z.object({
@@ -38,7 +38,6 @@ export default function CreateProjectPage() {
     register,
     handleSubmit,
     formState: { errors },
-    setValue,
     watch,
   } = useForm<ProjectForm>({
     resolver: zodResolver(projectSchema),

@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import Link from 'next/link'
-import { CheckCircle, Clock, Users, Zap, BarChart3, Shield, ArrowRight, Star } from 'lucide-react'
+import { CheckCircle, Clock, Users, Zap, BarChart3, Shield, ArrowRight } from 'lucide-react'
 
 export default function Home() {
   const { user, loading } = useAuth()
