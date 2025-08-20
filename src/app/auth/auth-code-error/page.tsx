@@ -85,7 +85,7 @@ export default function AuthCodeErrorPage() {
               <p>If you continue to experience issues:</p>
               <ul className="list-disc list-inside space-y-1">
                 <li>Check your email for the most recent authentication link</li>
-                <li>Make sure you're clicking the link from the same device/browser</li>
+                <li>Make sure you&apos;re clicking the link from the same device/browser</li>
                 <li>Try clearing your browser cache and cookies</li>
                 <li>Request a new authentication email</li>
               </ul>

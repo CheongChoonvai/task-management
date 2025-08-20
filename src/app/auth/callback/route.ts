@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
+type OtpType = 'sms' | 'email';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
@@ -9,6 +10,8 @@ export async function GET(request: NextRequest) {
   const error = searchParams.get('error')
   const token_hash = searchParams.get('token_hash')
   const type = searchParams.get('type')
+  const email = searchParams.get('email')
+  const phone = searchParams.get('phone')
 
   console.log('Auth callback called with:', {
     code: code ? 'present' : 'missing',
@@ -45,19 +48,34 @@ export async function GET(request: NextRequest) {
   }
 
   // Try token hash verification
-  if (token_hash && type) {
-    console.log('Attempting to verify OTP with token hash...')
+  if (token_hash && type === 'email') {
+    console.log('Attempting to verify OTP with token hash (email)...');
     const { data, error: verifyError } = await supabase.auth.verifyOtp({
-      token_hash,
-      type: type as any
-    })
-    
+      token: token_hash,
+      type: 'email',
+      email: email || ''
+    });
     if (!verifyError && data.session) {
-      console.log('OTP verification successful, redirecting to:', next)
-      return NextResponse.redirect(`${new URL(request.url).origin}${next}`)
+      console.log('OTP verification successful, redirecting to:', next);
+      return NextResponse.redirect(`${new URL(request.url).origin}${next}`);
     } else {
-      console.error('OTP verification failed:', verifyError)
+      console.error('OTP verification failed:', verifyError);
     }
+  } else if (token_hash && type === 'sms') {
+    console.log('Attempting to verify OTP with token hash (sms)...');
+    const { data, error: verifyError } = await supabase.auth.verifyOtp({
+      token: token_hash,
+      type: 'sms',
+      phone: phone || ''
+    });
+    if (!verifyError && data.session) {
+      console.log('OTP verification successful, redirecting to:', next);
+      return NextResponse.redirect(`${new URL(request.url).origin}${next}`);
+    } else {
+      console.error('OTP verification failed:', verifyError);
+    }
+  } else if (token_hash) {
+    console.error('Invalid OTP type:', type);
   }
 
   // If no auth parameters, just redirect to dashboard (maybe user is already logged in)

@@ -90,9 +90,13 @@ export default function ChangePasswordPage() {
         router.push('/dashboard')
       }, 2000)
 
-    } catch (error: any) {
+  } catch (error: unknown) {
       setIsSuccess(false)
-      setMessage(error.message || 'An error occurred while updating password')
+      if (error instanceof Error) {
+        setMessage(error.message || 'An error occurred while updating password');
+      } else {
+        setMessage('An error occurred while updating password');
+      }
     } finally {
       setLoading(false)
     }

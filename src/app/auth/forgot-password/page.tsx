@@ -26,10 +26,14 @@ export default function ResetPasswordPage() {
       if (error) throw error
 
       setIsSuccess(true)
-      setMessage('Check your email for the password reset link')
-    } catch (error: any) {
+  setMessage('Check your email for the password reset link')
+  } catch (error: unknown) {
       setIsSuccess(false)
-      setMessage(error.message || 'An error occurred')
+      if (error instanceof Error) {
+        setMessage(error.message || 'An error occurred');
+      } else {
+        setMessage('An error occurred');
+      }
     } finally {
       setLoading(false)
     }

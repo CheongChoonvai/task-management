@@ -56,8 +56,12 @@ export default function CustomAuth({ onSuccess }: CustomAuthProps) {
       } else {
         setMessage('Confirmation email sent! Please check your email (including spam folder).');
       }
-    } catch (error: any) {
-      setMessage(`Error: ${error.message}`);
+  } catch (error: unknown) {
+      if (error instanceof Error) {
+        setMessage(`Error: ${error.message}`);
+      } else {
+        setMessage('An error occurred');
+      }
     } finally {
       setLoading(false);
     }
@@ -107,8 +111,12 @@ export default function CustomAuth({ onSuccess }: CustomAuthProps) {
           setView('sign_in');
         }
       }
-    } catch (error: any) {
-      setMessage(error.message)
+  } catch (error: unknown) {
+      if (error instanceof Error) {
+        setMessage(error.message);
+      } else {
+        setMessage('An error occurred');
+      }
     } finally {
       setLoading(false)
     }

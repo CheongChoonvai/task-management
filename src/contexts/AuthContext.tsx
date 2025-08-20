@@ -44,23 +44,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   // Function to ensure member record exists for the user
-  const ensureMemberExists = async (user: any) => {
+  const ensureMemberExists = async (user: unknown) => {
+    if (!user || typeof user !== 'object' || user === null) return;
+    const u = user as { id: string; email?: string; isNewUser?: boolean; user_metadata?: { full_name?: string } };
     try {
       // Check if member already exists
-      const { data: existingMember } = await supabase
-        .from('members')
-        .select('id')
-        .eq('id', user.id)
-        .single()
+        const { data: existingMember } = await supabase
+          .from('members')
+          .select('id')
+          .eq('id', u.id)
+          .single()
 
       // Only create member if not found and this is a sign up event
-      if (!existingMember && user.isNewUser) {
-        const { error } = await supabase
-          .from('members')
-          .insert({
-            id: user.id,
-            email: user.email,
-            full_name: user.user_metadata?.full_name || null,
+        if (!existingMember && u.isNewUser) {
+          const { error } = await supabase
+            .from('members')
+            .insert({
+              id: u.id,
+              email: u.email,
+              full_name: u.user_metadata?.full_name || null,
             role: 'user',
             is_active: true
           })

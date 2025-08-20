@@ -62,9 +62,13 @@ export default function ResetPasswordConfirmPage() {
       setTimeout(() => {
         router.push('/dashboard')
       }, 2000)
-    } catch (error: any) {
+  } catch (error: unknown) {
       setIsSuccess(false)
-      setMessage(error.message || 'An error occurred')
+      if (error instanceof Error) {
+        setMessage(error.message || 'An error occurred');
+      } else {
+        setMessage('An error occurred');
+      }
     } finally {
       setLoading(false)
     }
