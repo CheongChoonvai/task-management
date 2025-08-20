@@ -219,10 +219,10 @@ export default function ProjectDetailPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Please sign in</h1>
-          <Link href="/login" className="text-blue-600 hover:text-blue-800">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4 font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>Please sign in</h1>
+          <Link href="/login" className="text-primary-600 hover:text-primary-800 font-jura" style={{ color: 'var(--primary-600, #007f6d)', fontFamily: 'Jura, sans-serif' }}>
             Go to login
           </Link>
         </div>
@@ -232,8 +232,8 @@ export default function ProjectDetailPage() {
 
   if (loading || !project) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
       </div>
     )
   }
@@ -242,22 +242,23 @@ export default function ProjectDetailPage() {
   const totalTasks = tasks.length
 
   return (
-    <div className="min-h-screen bg-gray-50">
+  <div className="min-h-screen bg-gray-50 font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div className="bg-surface shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between py-6 gap-4">
             <div className="flex flex-col sm:flex-row sm:items-center gap-2">
               <Link
                 href="/projects"
-                className="flex items-center text-gray-600 hover:text-gray-900 mr-0 sm:mr-4"
+                className="flex items-center text-primary-600 hover:text-primary-800 font-jura mr-0 sm:mr-4"
+                style={{ color: 'var(--primary-600, #007f6d)', fontFamily: 'Jura, sans-serif' }}
               >
-                <ArrowLeft className="w-5 h-5 mr-1" />
+                <ArrowLeft className="w-5 h-5 mr-1 text-primary-600" style={{ color: 'var(--primary-600, #007f6d)' }} />
                 Back to Projects
               </Link>
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{project.title}</h1>
-                <p className="mt-1 text-sm text-gray-500">
+                <h1 className="text-2xl md:text-3xl font-bold text-primary-600 font-jura" style={{ color: 'var(--primary-600, #007f6d)', fontFamily: 'Jura, sans-serif' }}>{project.title}</h1>
+                <p className="mt-1 text-sm text-primary-500 font-jura" style={{ color: 'var(--primary-500, #008774)', fontFamily: 'Jura, sans-serif' }}>
                   Project Details and Tasks
                 </p>
               </div>
@@ -265,9 +266,10 @@ export default function ProjectDetailPage() {
             <div className="flex flex-col sm:flex-row gap-2 md:gap-3 w-full md:w-auto">
               <Link
                 href={`/tasks/create?project=${projectId}`}
-                className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
+                className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-jura rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700"
+                style={{ backgroundColor: 'var(--primary-600, #007f6d)', fontFamily: 'Jura, sans-serif' }}
               >
-                <Plus className="w-4 h-4 mr-2" />
+                <Plus className="w-4 h-4 mr-2 text-white" />
                 Add Task
               </Link>
             </div>
@@ -277,43 +279,39 @@ export default function ProjectDetailPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Project Overview */}
-        <div className="bg-white shadow rounded-lg mb-8">
-          <div className="p-6">
+  <div className="bg-surface shadow rounded-lg mb-8">
+          <div className="p-6 font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Project Info */}
               <div className="md:col-span-1 lg:col-span-2">
                 <div className="flex items-center space-x-3 mb-4">
-                  <span className={`px-3 py-1 text-sm font-medium rounded-full ${getStatusStyles(project.status)}`}>
-                    {project.status}
-                  </span>
-                  <span className={`px-3 py-1 text-sm font-medium rounded-full ${getPriorityStyles(project.priority)}`}>
-                    {project.priority} priority
-                  </span>
+                  <span className={`px-3 py-1 text-sm font-jura font-medium rounded-full ${getStatusStyles(project.status)}`}>{project.status}</span>
+                  <span className={`px-3 py-1 text-sm font-jura font-medium rounded-full ${getPriorityStyles(project.priority)}`}>{project.priority} priority</span>
                 </div>
 
                 {project.description && (
-                  <p className="text-gray-600 mb-4">{project.description}</p>
+                  <p className="text-primary-500 mb-4 font-jura" style={{ color: 'var(--primary-500, #008774)', fontFamily: 'Jura, sans-serif' }}>{project.description}</p>
                 )}
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                  <div className="flex items-center text-gray-500">
-                    <User className="w-4 h-4 mr-2" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
+                  <div className="flex items-center text-primary-500 font-jura" style={{ color: 'var(--primary-500, #008774)', fontFamily: 'Jura, sans-serif' }}>
+                    <User className="w-4 h-4 mr-2 text-primary-600" style={{ color: 'var(--primary-600, #007f6d)' }} />
                     <span>Lead: {getDisplayName(project.lead, project.lead?.email)}</span>
                   </div>
                   {project.deadline && (
-                    <div className="flex items-center text-gray-500">
-                      <Calendar className="w-4 h-4 mr-2" />
+                    <div className="flex items-center text-primary-500 font-jura" style={{ color: 'var(--primary-500, #008774)', fontFamily: 'Jura, sans-serif' }}>
+                      <Calendar className="w-4 h-4 mr-2 text-primary-600" style={{ color: 'var(--primary-600, #007f6d)' }} />
                       <span>Due: {new Date(project.deadline).toLocaleDateString()}</span>
                     </div>
                   )}
                   {project.budget > 0 && (
-                    <div className="flex items-center text-gray-500">
-                      <DollarSign className="w-4 h-4 mr-2" />
+                    <div className="flex items-center text-primary-500 font-jura" style={{ color: 'var(--primary-500, #008774)', fontFamily: 'Jura, sans-serif' }}>
+                      <DollarSign className="w-4 h-4 mr-2 text-primary-600" style={{ color: 'var(--primary-600, #007f6d)' }} />
                       <span>Budget: ${project.budget.toLocaleString()}</span>
                     </div>
                   )}
-                  <div className="flex items-center text-gray-500">
-                    <TrendingUp className="w-4 h-4 mr-2" />
+                  <div className="flex items-center text-primary-500 font-jura" style={{ color: 'var(--primary-500, #008774)', fontFamily: 'Jura, sans-serif' }}>
+                    <TrendingUp className="w-4 h-4 mr-2 text-primary-600" style={{ color: 'var(--primary-600, #007f6d)' }} />
                     <span>{totalTasks} tasks ({completedTasks} completed)</span>
                   </div>
                 </div>
@@ -322,26 +320,27 @@ export default function ProjectDetailPage() {
               {/* Progress */}
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-lg font-medium text-gray-900">Progress</h3>
+                  <h3 className="text-lg font-medium text-primary-600 font-jura" style={{ color: 'var(--primary-600, #007f6d)', fontFamily: 'Jura, sans-serif' }}>Progress</h3>
                   <button
                     onClick={refreshProgress}
                     disabled={refreshing}
-                    className="inline-flex items-center px-2 py-1 text-xs font-medium rounded text-gray-500 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-50"
+                    className="inline-flex items-center px-2 py-1 text-xs font-jura font-medium rounded text-primary-500 hover:text-primary-700 hover:bg-primary-50 disabled:opacity-50"
+                    style={{ color: 'var(--primary-500, #008774)', fontFamily: 'Jura, sans-serif' }}
                     title="Refresh progress calculation"
                   >
-                    <RefreshCw className={`w-3 h-3 mr-1 ${refreshing ? 'animate-spin' : ''}`} />
+                    <RefreshCw className={`w-3 h-3 mr-1 text-primary-600 ${refreshing ? 'animate-spin' : ''}`} style={{ color: 'var(--primary-600, #007f6d)' }} />
                     Refresh
                   </button>
                 </div>
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-blue-600 mb-2">{project.progress}%</div>
+                <div className="text-center font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
+                  <div className="text-4xl font-bold text-primary-600 mb-2 font-jura" style={{ color: 'var(--primary-600, #007f6d)', fontFamily: 'Jura, sans-serif' }}>{project.progress}%</div>
                   <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
                     <div
-                      className="bg-blue-600 h-3 rounded-full transition-all duration-300"
-                      style={{ width: `${project.progress}%` }}
+                      className="bg-primary-600 h-3 rounded-full transition-all duration-300"
+                      style={{ width: `${project.progress}%`, backgroundColor: 'var(--primary-600, #007f6d)' }}
                     ></div>
                   </div>
-                  <p className="text-sm text-gray-500">Overall completion</p>
+                  <p className="text-sm text-primary-500 font-jura" style={{ color: 'var(--primary-500, #008774)', fontFamily: 'Jura, sans-serif' }}>Overall completion</p>
                 </div>
               </div>
             </div>
@@ -349,72 +348,62 @@ export default function ProjectDetailPage() {
         </div>
 
         {/* Tasks */}
-        <div className="bg-white shadow rounded-lg">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg leading-6 font-medium text-gray-900">Project Tasks</h3>
+  <div className="bg-surface shadow rounded-lg">
+          <div className="px-6 py-4 border-b border-gray-200 font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
+            <h3 className="text-lg leading-6 font-medium text-primary-600 font-jura" style={{ color: 'var(--primary-600, #007f6d)', fontFamily: 'Jura, sans-serif' }}>Project Tasks</h3>
           </div>
-          <div className="p-6">
+          <div className="p-6 font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
             {tasks.length === 0 ? (
-              <div className="text-center py-8">
-                <Circle className="mx-auto h-12 w-12 text-gray-400" />
-                <h3 className="mt-2 text-sm font-medium text-gray-900">No tasks yet</h3>
-                <p className="mt-1 text-sm text-gray-500">Get started by creating a task for this project.</p>
+              <div className="text-center py-8 font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
+                <Circle className="mx-auto h-12 w-12 text-primary-400" style={{ color: 'var(--primary-400, #009883)' }} />
+                <h3 className="mt-2 text-sm font-medium text-primary-600 font-jura" style={{ color: 'var(--primary-600, #007f6d)', fontFamily: 'Jura, sans-serif' }}>No tasks yet</h3>
+                <p className="mt-1 text-sm text-primary-500 font-jura" style={{ color: 'var(--primary-500, #008774)', fontFamily: 'Jura, sans-serif' }}>Get started by creating a task for this project.</p>
                 <div className="mt-6">
                   <Link
                     href={`/tasks/create?project=${projectId}`}
-                    className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                    className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-jura rounded-md text-white bg-primary-600 hover:bg-primary-700"
+                    style={{ backgroundColor: 'var(--primary-600, #007f6d)', fontFamily: 'Jura, sans-serif' }}
                   >
-                    <Plus className="w-4 h-4 mr-2" />
+                    <Plus className="w-4 h-4 mr-2 text-white" />
                     Add Task
                   </Link>
                 </div>
               </div>
             ) : (
-              <div className="space-y-4 max-h-96 overflow-y-auto">
+              <div className="space-y-4 max-h-96 overflow-y-auto font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
                 {tasks.map((task) => (
-                  <div key={task.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+                  <div key={task.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-primary-50">
                     <div className="flex items-center space-x-3 flex-1">
                 {task.status === 'completed' ? (
-                  <span className="text-sm font-medium text-green-600 bg-green-100 px-3 py-1 rounded-full">
-                    Completed
-                  </span>
+                  <span className="text-sm font-jura font-medium text-green-600 bg-green-100 px-3 py-1 rounded-full">Completed</span>
                 ) : (
                   (taskAssignments[task.id]?.includes(currentMember?.id)) ? (
                     <button
                       onClick={() => updateTaskStatus(task.id, 'completed')}
-                      className="text-sm font-medium text-blue-600 bg-blue-100 hover:bg-blue-200 px-3 py-1 rounded-full transition-colors"
+                      className="text-sm font-jura font-medium text-primary-600 bg-primary-100 hover:bg-primary-200 px-3 py-1 rounded-full transition-colors"
+                      style={{ color: 'var(--primary-600, #007f6d)', fontFamily: 'Jura, sans-serif' }}
                     >
                       Complete
                     </button>
                   ) : (
-                    <span className="text-xs text-gray-400 bg-gray-100 px-3 py-1 rounded-full cursor-not-allowed">
-                      Only assigned member can complete
-                    </span>
+                    <span className="text-xs font-jura text-gray-400 bg-gray-100 px-3 py-1 rounded-full cursor-not-allowed">Only assigned member can complete</span>
                   )
                 )}
                       <div className="flex-1 min-w-0">
-                        <p className={`text-sm font-medium ${task.status === 'completed' ? 'line-through text-gray-500' : 'text-gray-900'}`}>
+                        <p className={`text-sm font-jura font-medium ${task.status === 'completed' ? 'line-through text-gray-500' : 'text-primary-600'}`} style={{ color: task.status === 'completed' ? undefined : 'var(--primary-600, #007f6d)', fontFamily: 'Jura, sans-serif' }}>
                           {task.title}
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs font-jura text-primary-500" style={{ color: 'var(--primary-500, #008774)', fontFamily: 'Jura, sans-serif' }}>
                           Created by: {getDisplayName(task.creator, task.creator?.email)}
                         </p>
                         <div className="flex items-center space-x-2 mt-1">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityStyles(task.priority)}`}>
-                            {task.priority}
-                          </span>
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusStyles(task.status)}`}>
-                            {task.status.replace('_', ' ')}
-                          </span>
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-jura font-medium ${getPriorityStyles(task.priority)}`}>{task.priority}</span>
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-jura font-medium ${getStatusStyles(task.status)}`}>{task.status.replace('_', ' ')}</span>
                           {task.progress > 0 && (
-                            <span className="text-xs text-gray-500">
-                              {task.progress}% complete
-                            </span>
+                            <span className="text-xs font-jura text-primary-500" style={{ color: 'var(--primary-500, #008774)', fontFamily: 'Jura, sans-serif' }}>{task.progress}% complete</span>
                           )}
                           {task.project_contribution > 0 && (
-                            <span className="text-xs text-gray-500">
-                              {task.project_contribution}% contribution
-                            </span>
+                            <span className="text-xs font-jura text-primary-500" style={{ color: 'var(--primary-500, #008774)', fontFamily: 'Jura, sans-serif' }}>{task.project_contribution}% contribution</span>
                           )}
                         </div>
                       </div>
@@ -424,7 +413,8 @@ export default function ProjectDetailPage() {
                         <>
                           <Link
                             href={`/tasks/${task.id}/edit`}
-                            className="text-blue-600 hover:text-blue-800 text-sm"
+                            className="text-primary-600 hover:text-primary-800 text-sm font-jura"
+                            style={{ color: 'var(--primary-600, #007f6d)', fontFamily: 'Jura, sans-serif' }}
                           >
                             Edit
                           </Link>
@@ -434,13 +424,14 @@ export default function ProjectDetailPage() {
                                 deleteTask(task.id)
                               }
                             }}
-                            className="text-red-600 hover:text-red-800 text-sm"
+                            className="text-red-600 hover:text-red-800 text-sm font-jura"
+                            style={{ fontFamily: 'Jura, sans-serif' }}
                           >
                             Delete
                           </button>
                         </>
                       ) : (
-                        <span className="text-gray-400 text-sm">Task completed</span>
+                        <span className="text-gray-400 text-sm font-jura">Task completed</span>
                       )}
                     </div>
                   </div>

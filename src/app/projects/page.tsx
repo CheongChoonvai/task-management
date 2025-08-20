@@ -92,9 +92,9 @@ export default function ProjectsPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'planning': return 'bg-blue-100 text-blue-800'
-      case 'active': return 'bg-green-100 text-green-800'
-      case 'on-hold': return 'bg-yellow-100 text-yellow-800'
+  case 'planning': return 'bg-autumn-100 text-autumn-800'
+      case 'active': return 'bg-orange-100 text-orange-800'
+      case 'on-hold': return 'bg-brown-100 text-brown-800'
       case 'completed': return 'bg-gray-100 text-gray-800'
       default: return 'bg-gray-100 text-gray-800'
     }
@@ -103,18 +103,18 @@ export default function ProjectsPage() {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'high': return 'bg-red-100 text-red-800'
-      case 'medium': return 'bg-yellow-100 text-yellow-800'
-      case 'low': return 'bg-green-100 text-green-800'
+      case 'medium': return 'bg-orange-100 text-orange-800'
+      case 'low': return 'bg-brown-100 text-brown-800'
       default: return 'bg-gray-100 text-gray-800'
     }
   }
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Please sign in</h1>
-          <Link href="/login" className="text-blue-600 hover:text-blue-800">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4 font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>Please sign in</h1>
+          <Link href="/login" className="text-primary-600 hover:text-primary-800 font-jura" style={{ color: 'var(--primary-600, #007f6d)', fontFamily: 'Jura, sans-serif' }}>
             Go to login
           </Link>
         </div>
@@ -123,26 +123,30 @@ export default function ProjectsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+  <div className="min-h-screen bg-gray-50 font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div className="bg-surface shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
           <div className="flex justify-between items-center py-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Projects</h1>
-              <p className="mt-1 text-sm text-gray-500">
+              <h1 className="text-3xl font-bold text-autumn-600 font-jura" style={{ color: 'var(--autumn-600, #d4792f)', fontFamily: 'Jura, sans-serif' }}>Projects</h1>
+              <p className="mt-1 text-sm text-autumn-500 font-jura" style={{ color: 'var(--autumn-500, #e8954a)', fontFamily: 'Jura, sans-serif' }}>
                 Manage your projects and track progress
               </p>
             </div>
             <div className="flex space-x-3">
-              <Link href="/dashboard" className="text-gray-600 hover:text-gray-900">
+              <Link href="/calendar" className="text-autumn-600 hover:text-autumn-800 font-jura" style={{ color: 'var(--autumn-600, #d4792f)', fontFamily: 'Jura, sans-serif' }}>
+                Calendar
+              </Link>
+              <Link href="/dashboard" className="text-autumn-600 hover:text-autumn-800 font-jura" style={{ color: 'var(--autumn-600, #d4792f)', fontFamily: 'Jura, sans-serif' }}>
                 Dashboard
               </Link>
               <Link
                 href="/projects/create"
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-jura rounded-md shadow-sm text-white bg-autumn-600 hover:bg-autumn-700"
+                style={{ backgroundColor: 'var(--autumn-600, #d4792f)', fontFamily: 'Jura, sans-serif' }}
               >
-                <Plus className="w-4 h-4 mr-2" />
+                <Plus className="w-4 h-4 mr-2 text-white" />
                 New Project
               </Link>
             </div>
@@ -153,66 +157,64 @@ export default function ProjectsPage() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {loading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-2 text-gray-500">Loading projects...</p>
+          <div className="text-center py-12 font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-autumn-600 mx-auto"></div>
+            <p className="mt-2 text-autumn-500 font-jura" style={{ color: 'var(--autumn-500, #e8954a)', fontFamily: 'Jura, sans-serif' }}>Loading projects...</p>
           </div>
         ) : projects.length === 0 ? (
-          <div className="text-center py-12">
+          <div className="text-center py-12 font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
             <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-              <TrendingUp className="w-12 h-12 text-gray-400" />
+              <TrendingUp className="w-12 h-12 text-autumn-400" style={{ color: 'var(--autumn-400, #f1a973)' }} />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No projects yet</h3>
-            <p className="text-gray-500 mb-6">Get started by creating your first project</p>
+            <h3 className="text-lg font-medium text-autumn-600 mb-2 font-jura" style={{ color: 'var(--autumn-600, #d4792f)', fontFamily: 'Jura, sans-serif' }}>No projects yet</h3>
+            <p className="text-autumn-500 mb-6 font-jura" style={{ color: 'var(--autumn-500, #e8954a)', fontFamily: 'Jura, sans-serif' }}>Get started by creating your first project</p>
             <Link
               href="/projects/create"
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-jura rounded-md shadow-sm text-white bg-autumn-600 hover:bg-autumn-700"
+              style={{ backgroundColor: 'var(--autumn-600, #d4792f)', fontFamily: 'Jura, sans-serif' }}
             >
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="w-4 h-4 mr-2 text-white" />
               Create Project
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
             {projects.map((project) => (
               <div
                 key={project.id}
-                className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
+                className="bg-surface rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow cursor-pointer font-jura"
+                style={{ fontFamily: 'Jura, sans-serif' }}
                 onClick={() => router.push(`/projects/${project.id}`)}
               >
                 <div className="p-6">
                   {/* Project Header */}
                   <div className="flex items-start justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900 truncate">
+                    <h3 className="text-lg font-semibold text-autumn-600 truncate font-jura" style={{ color: 'var(--autumn-600, #d4792f)', fontFamily: 'Jura, sans-serif' }}>
                       {project.title}
                     </h3>
                     <div className="flex space-x-2">
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(project.status)}`}>
-                        {project.status}
-                      </span>
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityColor(project.priority)}`}>
-                        {project.priority}
-                      </span>
+                      <span className={`px-2 py-1 text-xs font-jura font-medium rounded-full ${getStatusColor(project.status)}`}>{project.status}</span>
+                      <span className={`px-2 py-1 text-xs font-jura font-medium rounded-full ${getPriorityColor(project.priority)}`}>{project.priority}</span>
                     </div>
                   </div>
 
                   {/* Description */}
                   {project.description && (
-                    <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                    <p className="text-sm text-primary-500 mb-4 line-clamp-2 font-jura" style={{ color: 'var(--primary-500, #008774)', fontFamily: 'Jura, sans-serif' }}>
                       {project.description}
                     </p>
                   )}
 
                   {/* Progress Bar */}
                   <div className="mb-4">
-                    <div className="flex justify-between text-sm text-gray-600 mb-1">
+                    <div className="flex justify-between text-sm text-primary-500 mb-1 font-jura" style={{ color: 'var(--primary-500, #008774)', fontFamily: 'Jura, sans-serif' }}>
                       <span>Progress</span>
                       <span>{project.progress}%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
-                        className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${project.progress}%` }}
+                        className="bg-primary-600 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${project.progress}%`, backgroundColor: 'var(--primary-600, #007f6d)' }}
                       ></div>
                     </div>
                   </div>
@@ -220,24 +222,24 @@ export default function ProjectsPage() {
                   {/* Stats */}
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-gray-900">{project.tasks_count || 0}</div>
-                      <div className="text-xs text-gray-500">Total Tasks</div>
+                      <div className="text-2xl font-bold text-primary-600 font-jura" style={{ color: 'var(--primary-600, #007f6d)', fontFamily: 'Jura, sans-serif' }}>{project.tasks_count || 0}</div>
+                      <div className="text-xs text-primary-500 font-jura" style={{ color: 'var(--primary-500, #008774)', fontFamily: 'Jura, sans-serif' }}>Total Tasks</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-green-600">{project.completed_tasks || 0}</div>
-                      <div className="text-xs text-gray-500">Completed</div>
+                      <div className="text-2xl font-bold text-green-600 font-jura" style={{ color: 'var(--green-600, #16a34a)', fontFamily: 'Jura, sans-serif' }}>{project.completed_tasks || 0}</div>
+                      <div className="text-xs text-primary-500 font-jura" style={{ color: 'var(--primary-500, #008774)', fontFamily: 'Jura, sans-serif' }}>Completed</div>
                     </div>
                   </div>
 
                   {/* Footer */}
-                  <div className="flex items-center justify-between text-sm text-gray-500">
+                  <div className="flex items-center justify-between text-sm text-primary-500 font-jura" style={{ color: 'var(--primary-500, #008774)', fontFamily: 'Jura, sans-serif' }}>
                     <div className="flex items-center">
-                      <User className="w-4 h-4 mr-1" />
+                      <User className="w-4 h-4 mr-1 text-primary-600" style={{ color: 'var(--primary-600, #007f6d)' }} />
                       <span>{project.lead?.full_name || project.lead?.email || 'Unassigned'}</span>
                     </div>
                     {project.deadline && (
                       <div className="flex items-center">
-                        <Calendar className="w-4 h-4 mr-1" />
+                        <Calendar className="w-4 h-4 mr-1 text-primary-600" style={{ color: 'var(--primary-600, #007f6d)' }} />
                         <span>{new Date(project.deadline).toLocaleDateString()}</span>
                       </div>
                     )}
@@ -245,8 +247,8 @@ export default function ProjectsPage() {
 
                   {/* Budget */}
                   {project.budget > 0 && (
-                    <div className="mt-2 flex items-center text-sm text-gray-500">
-                      <DollarSign className="w-4 h-4 mr-1" />
+                    <div className="mt-2 flex items-center text-sm text-primary-500 font-jura" style={{ color: 'var(--primary-500, #008774)', fontFamily: 'Jura, sans-serif' }}>
+                      <DollarSign className="w-4 h-4 mr-1 text-primary-600" style={{ color: 'var(--primary-600, #007f6d)' }} />
                       <span>${project.budget.toLocaleString()}</span>
                     </div>
                   )}

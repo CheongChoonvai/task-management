@@ -1,154 +1,115 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase, updateProjectProgress } from '@/lib/supabase'
-import { Plus, LogOut, Clock, CheckCircle, Circle, AlertCircle, TrendingUp, User, Calendar, BarChart3 } from 'lucide-react'
+import { dashboardDataManager, type DashboardData, type Task, type Project } from '@/lib/dashboardDataManager'
+import { Plus, LogOut, Clock, CheckCircle, Circle, AlertCircle, TrendingUp, User, Calendar, BarChart3, RefreshCw, AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
 import { getDisplayName, getStatusStyles, getPriorityStyles } from '@/lib/utils'
 
-interface Task {
-  id: string
-  title: string
-  description: string | null
-  project_id: string | null
-  status: string
-  priority: string
-  progress: number
-  project_contribution: number
-  created_by: string | null
-  due_date: string | null
-  completed_at: string | null
-  created_at: string
-  updated_at: string
-  // Joined data
-  project?: {
-    title: string
-    status: string
+// Enhanced state management with clear loading and error states
+interface DashboardState {
+  data: DashboardData | null
+  loading: {
+    initial: boolean
+    tasks: boolean
+    refreshing: boolean
   }
-}
-
-interface Project {
-  id: string
-  title: string
-  status: string
-  progress: number
-  tasks_count: number
-  completed_tasks: number
+  error: {
+    message: string | null
+    type: 'fetch' | 'update' | null
+  }
 }
 
 export default function DashboardPage() {
   const { user, signOut } = useAuth()
   const router = useRouter()
-  const [tasks, setTasks] = useState<Task[]>([])
-  const [projects, setProjects] = useState<Project[]>([])
-  const [loading, setLoading] = useState(true)
-  const [currentMember, setCurrentMember] = useState<any>(null)
-
-  useEffect(() => {
-    if (user) {
-      fetchCurrentMember()
+  
+  // Simplified state management with clear structure
+  const [state, setState] = useState<DashboardState>({
+    data: null,
+    loading: {
+      initial: true,
+      tasks: false,
+      refreshing: false
+    },
+    error: {
+      message: null,
+      type: null
     }
-  }, [user])
+  })
 
-  useEffect(() => {
-    if (currentMember) {
-      fetchTasks()
-      fetchProjects()
-    }
-  }, [currentMember])
+  // Helper function to update loading state
+  const setLoading = (key: keyof DashboardState['loading'], value: boolean) => {
+    setState(prev => ({
+      ...prev,
+      loading: { ...prev.loading, [key]: value }
+    }))
+  }
 
-  const fetchCurrentMember = async () => {
+  // Helper function to set error state
+  const setError = (message: string | null, type: DashboardState['error']['type'] = null) => {
+    setState(prev => ({
+      ...prev,
+      error: { message, type }
+    }))
+  }
+
+  // Clear error state
+  const clearError = () => setError(null)
+
+  // Load dashboard data using the optimized data manager
+  const loadDashboardData = useCallback(async (forceRefresh = false) => {
+    if (!user?.email) return
+
     try {
-      const { data, error } = await supabase
-        .from('members')
-        .select('*')
-        .eq('email', user?.email)
-        .single()
+      setLoading('initial', true)
+      clearError()
 
-      if (error) {
-        // If member doesn't exist, create one
-        if (error.code === 'PGRST116') {
-          const { data: newMember, error: createError } = await supabase
-            .from('members')
-            .insert([{
-              email: user?.email || '',
-              full_name: user?.user_metadata?.full_name || null,
-            }])
-            .select()
-            .single()
-
-          if (createError) throw createError
-          setCurrentMember(newMember)
-        } else {
-          throw error
-        }
-      } else {
-        setCurrentMember(data)
+      if (forceRefresh) {
+        dashboardDataManager.clearAllCache()
       }
-    } catch (error) {
-      console.error('Error fetching/creating current member:', error)
-    }
-  }
 
-  const fetchTasks = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('tasks')
-        .select(`
-          *,
-          project:projects(title, status)
-        `)
-        .eq('created_by', currentMember.id)
-        .order('created_at', { ascending: false })
+      // First get the current member
+      const currentMember = await dashboardDataManager.getCurrentMember(user.email)
+      
+      // Then get all dashboard data in one optimized call
+      const dashboardData = await dashboardDataManager.getDashboardData(currentMember.id)
 
-      if (error) throw error
-      setTasks(data || [])
+      setState(prev => ({
+        ...prev,
+        data: dashboardData,
+        loading: { ...prev.loading, initial: false },
+        error: { message: null, type: null }
+      }))
+
     } catch (error) {
-      console.error('Error fetching tasks:', error)
+      console.error('Error loading dashboard data:', error)
+      setError(error instanceof Error ? error.message : 'Failed to load dashboard data', 'fetch')
     } finally {
-      setLoading(false)
+      setLoading('initial', false)
     }
-  }
+  }, [user?.email])
 
-  const fetchProjects = async () => {
-    try {
-      // Get projects where user is the lead
-      const { data: projectsData, error: projectsError } = await supabase
-        .from('projects')
-        .select('*')
-        .eq('lead_id', currentMember.id)
-        .order('created_at', { ascending: false })
+  // Load data on component mount
+  useEffect(() => {
+    loadDashboardData()
+  }, [loadDashboardData])
 
-      if (projectsError) throw projectsError
-
-      // Get task counts for each project
-      const projectsWithCounts = await Promise.all(
-        projectsData.map(async (project) => {
-          const { data: tasksData } = await supabase
-            .from('tasks')
-            .select('id, status')
-            .eq('project_id', project.id)
-
-          const tasks_count = tasksData?.length || 0
-          const completed_tasks = tasksData?.filter(task => task.status === 'completed').length || 0
-
-          return {
-            ...project,
-            tasks_count,
-            completed_tasks
-          }
-        })
-      )
-
-      setProjects(projectsWithCounts)
-    } catch (error) {
-      console.error('Error fetching projects:', error)
-    }
-  }
+  // Refresh data function for error recovery
+  const refreshData = useCallback(async () => {
+    setLoading('refreshing', true)
+    await loadDashboardData(true)
+    setLoading('refreshing', false)
+  }, [loadDashboardData])
 
   const updateTaskStatus = async (taskId: string, newStatus: string) => {
+    if (!state.data) return
+    
+    setLoading('tasks', true)
+    
     try {
       const updates: any = { 
         status: newStatus, 
@@ -161,7 +122,7 @@ export default function DashboardPage() {
       }
 
       // Find the task to get its project_id
-      const task = tasks.find(t => t.id === taskId)
+      const task = state.data.tasks.find((t: Task) => t.id === taskId)
 
       const { error } = await supabase
         .from('tasks')
@@ -170,23 +131,39 @@ export default function DashboardPage() {
 
       if (error) throw error
       
-      setTasks(tasks.map(task => 
-        task.id === taskId ? { ...task, ...updates } : task
-      ))
+      // Update local state optimistically
+      setState(prev => ({
+        ...prev,
+        data: prev.data ? {
+          ...prev.data,
+          tasks: prev.data.tasks.map((task: Task) => 
+            task.id === taskId ? { ...task, ...updates } : task
+          )
+        } : null
+      }))
 
-      // Update project progress if task belongs to a project
+      // Invalidate cache and update project progress
+      dashboardDataManager.invalidateTaskCache()
       if (task?.project_id) {
         await updateProjectProgress(task.project_id)
+        dashboardDataManager.invalidateProjectCache()
       }
     } catch (error) {
       console.error('Error updating task:', error)
+      setError('Failed to update task. Please try again.', 'update')
+    } finally {
+      setLoading('tasks', false)
     }
   }
 
   const deleteTask = async (taskId: string) => {
+    if (!state.data) return
+    
+    setLoading('tasks', true)
+    
     try {
       // Find the task to get its project_id before deletion
-      const task = tasks.find(t => t.id === taskId)
+      const task = state.data.tasks.find((t: Task) => t.id === taskId)
 
       const { error } = await supabase
         .from('tasks')
@@ -195,18 +172,31 @@ export default function DashboardPage() {
 
       if (error) throw error
       
-      setTasks(tasks.filter(task => task.id !== taskId))
+      // Update local state optimistically
+      setState(prev => ({
+        ...prev,
+        data: prev.data ? {
+          ...prev.data,
+          tasks: prev.data.tasks.filter((task: Task) => task.id !== taskId)
+        } : null
+      }))
 
-      // Update project progress if task belonged to a project
+      // Invalidate cache and update project progress
+      dashboardDataManager.invalidateTaskCache()
       if (task?.project_id) {
         await updateProjectProgress(task.project_id)
+        dashboardDataManager.invalidateProjectCache()
       }
     } catch (error) {
       console.error('Error deleting task:', error)
+      setError('Failed to delete task. Please try again.', 'update')
+    } finally {
+      setLoading('tasks', false)
     }
   }
 
   const handleSignOut = async () => {
+    dashboardDataManager.clearAllCache()
     await signOut()
     router.push('/login')
   }
@@ -214,25 +204,34 @@ export default function DashboardPage() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed': return <CheckCircle className="w-5 h-5 text-green-500" />
-      case 'in_progress': return <Clock className="w-5 h-5 text-blue-500" />
+      case 'in_progress': return <Clock className="w-5 h-5 text-primary-500" />
       default: return <Circle className="w-5 h-5 text-gray-400" />
     }
   }
 
   const getPriorityColor = (priority: string) => getPriorityStyles(priority)
-
   const getStatusColor = (status: string) => getStatusStyles(status)
 
-  const todoTasks = tasks.filter(t => t.status === 'todo')
-  const inProgressTasks = tasks.filter(t => t.status === 'in_progress')
-  const completedTasks = tasks.filter(t => t.status === 'completed')
+  // Derived state for better UX
+  const { data } = state
+  const tasks = data?.tasks || []
+  const projects = data?.projects || []
+  const currentMember = data?.currentMember
+  
+  const todoTasks = tasks.filter((t: Task) => t.status === 'todo')
+  const inProgressTasks = tasks.filter((t: Task) => t.status === 'in_progress')
+  const completedTasks = tasks.filter((t: Task) => t.status === 'completed')
+  
+  const isLoading = state.loading.initial
+  const isRefreshing = state.loading.refreshing
+  const hasError = !!state.error.message
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Please sign in</h1>
-          <Link href="/login" className="text-blue-600 hover:text-blue-800">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4 font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>Please sign in</h1>
+          <Link href="/login" className="text-primary-600 hover:text-primary-800 font-jura" style={{ color: 'var(--primary-600, #007f6d)', fontFamily: 'Jura, sans-serif' }}>
             Go to login
           </Link>
         </div>
@@ -241,34 +240,53 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
+      {/* Modern Header with Glassmorphism Effect */}
+      <div className="sticky top-0 z-50 backdrop-blur-md bg-white/80 border-b border-gray-200/60 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:justify-between md:items-center py-6 gap-4">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Task Dashboard</h1>
-              <p className="mt-1 text-sm text-gray-500">
-                Welcome back, {getDisplayName(currentMember, user?.email)}
-              </p>
+          <div className="flex flex-col md:flex-row md:justify-between md:items-center py-4 gap-4">
+            <div className="flex items-center space-x-4">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg" style={{ backgroundColor: 'var(--autumn-600, #d4792f)' }}>
+                <BarChart3 className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-autumn-700 font-jura">
+                                  Task Dashboard
+                                </h1>
+                <p className="mt-1 text-sm text-autumn-600 font-medium font-jura">
+                  Welcome back, {getDisplayName(currentMember, user?.email)} 👋
+                </p>
+              </div>
             </div>
-            <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-4 w-full md:w-auto">
+            <div className="flex flex-wrap items-center gap-3">
+              <Link
+                href="/calendar"
+                className="inline-flex items-center px-4 py-2 text-sm font-medium text-white rounded-lg transition-all duration-200 font-jura border border-autumn-200 hover:bg-autumn-700"
+                style={{ backgroundColor: 'var(--autumn-600, #d4792f)' }}
+              >
+                <Calendar className="w-4 h-4 mr-2" />
+                Calendar
+              </Link>
               <Link
                 href="/projects"
-                className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium text-center"
+                className="inline-flex items-center px-4 py-2 text-sm font-medium text-white rounded-lg transition-all duration-200 font-jura border border-autumn-200 hover:bg-brown-600"
+                style={{ backgroundColor: 'var(--brown-600, #a18072)' }}
               >
+                <TrendingUp className="w-4 h-4 mr-2" />
                 Projects
               </Link>
               <Link
                 href="/tasks/create"
-                className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
+                className="inline-flex items-center px-4 py-2 text-sm font-medium text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 font-jura hover:bg-orange-600"
+                style={{ backgroundColor: 'var(--orange-600, #ea580c)' }}
               >
                 <Plus className="w-4 h-4 mr-2" />
                 New Task
               </Link>
               <button
                 onClick={handleSignOut}
-                className="inline-flex items-center justify-center px-3 py-2 text-sm text-gray-600 hover:text-gray-900"
+                className="inline-flex items-center px-3 py-2 text-sm text-white rounded-lg transition-all duration-200 font-jura hover:bg-autumn-700"
+                style={{ backgroundColor: 'var(--autumn-600, #d4792f)' }}
               >
                 <LogOut className="w-4 h-4 mr-1" />
                 Sign Out
@@ -279,163 +297,298 @@ export default function DashboardPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <Circle className="h-6 w-6 text-gray-400" />
+        {/* Error Message with Modern Design */}
+        {hasError && (
+          <div className="mb-8 bg-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded-2xl p-6 shadow-lg">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                  <AlertTriangle className="h-5 w-5 text-red-600" />
                 </div>
-                <div className="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">To Do</dt>
-                    <dd className="text-lg font-medium text-gray-900">{todoTasks.length}</dd>
-                  </dl>
+              </div>
+              <div className="ml-4 flex-1">
+                <h3 className="text-sm font-semibold text-red-800">Something went wrong</h3>
+                <p className="mt-1 text-sm text-red-700">{state.error.message}</p>
+              </div>
+              <button
+                onClick={refreshData}
+                disabled={isRefreshing}
+                className="inline-flex items-center px-4 py-2 bg-white hover:bg-red-50 border border-red-300 rounded-lg text-sm font-medium text-red-700 transition-all duration-200 disabled:opacity-50 shadow-sm"
+              >
+                <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+                {isRefreshing ? 'Retrying...' : 'Retry'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Modern Loading State */}
+        {isLoading && (
+          <div className="flex items-center justify-center py-20">
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-primary-500 to-primary-600 rounded-2xl shadow-lg mb-4">
+                <RefreshCw className="animate-spin h-8 w-8 text-white" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Loading Dashboard</h3>
+              <p className="text-sm text-gray-600">Fetching your latest data...</p>
+            </div>
+          </div>
+        )}
+
+        {/* Modern Stats Cards */}
+        {!isLoading && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {/* To Do Tasks Card */}
+            <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden group">
+              <div className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300" style={{ backgroundColor: 'var(--primary-600, #007f6d)' }}>
+                      <Circle className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-600 font-jura">To Do</p>
+                      <p className="text-2xl font-bold text-gray-900 font-jura">{todoTasks.length}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-500"
+                        style={{ width: `${tasks.length > 0 ? (todoTasks.length / tasks.length) * 100 : 0}%` }}
+                      ></div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <Clock className="h-6 w-6 text-blue-400" />
-                </div>
-                <div className="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">In Progress</dt>
-                    <dd className="text-lg font-medium text-gray-900">{inProgressTasks.length}</dd>
-                  </dl>
+            {/* In Progress Tasks Card */}
+            <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden group">
+              <div className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300" style={{ backgroundColor: 'var(--orange-500, #f97316)' }}>
+                      <Clock className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-600 font-jura">In Progress</p>
+                      <p className="text-2xl font-bold text-gray-900 font-jura">{inProgressTasks.length}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-orange-500 to-orange-600 rounded-full transition-all duration-500"
+                        style={{ width: `${tasks.length > 0 ? (inProgressTasks.length / tasks.length) * 100 : 0}%` }}
+                      ></div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <CheckCircle className="h-6 w-6 text-green-400" />
-                </div>
-                <div className="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">Completed</dt>
-                    <dd className="text-lg font-medium text-gray-900">{completedTasks.length}</dd>
-                  </dl>
+            {/* Completed Tasks Card */}
+            <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden group">
+              <div className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300" style={{ backgroundColor: 'var(--brown-600, #a18072)' }}>
+                      <CheckCircle className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-600 font-jura">Completed</p>
+                      <p className="text-2xl font-bold text-gray-900 font-jura">{completedTasks.length}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-brown-500 to-brown-600 rounded-full transition-all duration-500"
+                        style={{ width: `${tasks.length > 0 ? (completedTasks.length / tasks.length) * 100 : 0}%` }}
+                      ></div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <TrendingUp className="h-6 w-6 text-purple-400" />
-                </div>
-                <div className="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">Projects</dt>
-                    <dd className="text-lg font-medium text-gray-900">{projects.length}</dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Recent Tasks */}
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">Recent Tasks</h3>
-            </div>
-            <div className="p-6">
-              {loading ? (
-                <div className="text-center py-4">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
-                </div>
-              ) : tasks.length === 0 ? (
-                <div className="text-center py-8">
-                  <Circle className="mx-auto h-12 w-12 text-gray-400" />
-                  <h3 className="mt-2 text-sm font-medium text-gray-900">No tasks yet</h3>
-                  <p className="mt-1 text-sm text-gray-500">Get started by creating a new task.</p>
-                  <div className="mt-6">
-                    <Link
-                      href="/tasks/create"
-                      className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      New Task
+            {/* Projects Card */}
+            <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden group">
+              <div className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300" style={{ backgroundColor: 'var(--autumn-600, #d4792f)' }}>
+                      <TrendingUp className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-600 font-jura">Projects</p>
+                      <p className="text-2xl font-bold text-gray-900 font-jura">{projects.length}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <Link href="/projects/create" className="text-autumn-600 hover:text-autumn-800 text-sm font-medium">
+                      Create →
                     </Link>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+          {/* Recent Tasks - Modern Card Design */}
+          <div className="xl:col-span-2 bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+            <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-autumn-50 to-autumn-100">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--autumn-600, #d4792f)' }}>
+                    <Clock className="w-4 h-4 text-white" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 font-jura">Recent Tasks</h3>
+                  <span className="bg-autumn-100 text-autumn-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                    {tasks.length} total
+                  </span>
+                </div>
+                <Link
+                  href="/tasks/create"
+                  className="inline-flex items-center text-sm font-medium text-autumn-600 hover:text-autumn-700 transition-colors duration-200"
+                >
+                  <Plus className="w-4 h-4 mr-1" />
+                  Add Task
+                </Link>
+              </div>
+            </div>
+            <div className="p-6">
+              {state.loading.tasks ? (
+                <div className="text-center py-8">
+                  <div className="inline-flex items-center justify-center w-12 h-12 bg-primary-100 rounded-full mb-4">
+                    <RefreshCw className="animate-spin h-6 w-6 text-primary-600" />
+                  </div>
+                  <p className="text-sm text-gray-600">Updating tasks...</p>
+                </div>
+              ) : tasks.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Circle className="h-10 w-10 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2 font-jura">No tasks yet</h3>
+                  <p className="text-gray-600 mb-6 max-w-sm mx-auto">Get started by creating your first task and boost your productivity!</p>
+                  <Link
+                    href="/tasks/create"
+                    className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
+                  >
+                    <Plus className="w-5 h-5 mr-2" />
+                    Create Your First Task
+                  </Link>
+                </div>
               ) : (
-                <div className="space-y-4 max-h-96 overflow-y-auto">
-                  {tasks.slice(0, 10).map((task) => (
-                    <div key={task.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
-                      <div className="flex items-center space-x-3 flex-1">
-                        {task.status === 'completed' ? (
-                          <span className="text-sm font-medium text-green-600 bg-green-100 px-3 py-1 rounded-full">
-                            Completed
-                          </span>
-                        ) : (
-                          <button
-                            onClick={() => updateTaskStatus(task.id, 'completed')}
-                            className="text-sm font-medium text-blue-600 bg-blue-100 hover:bg-blue-200 px-3 py-1 rounded-full transition-colors"
-                          >
-                            Complete
-                          </button>
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <p className={`text-sm font-medium ${task.status === 'completed' ? 'line-through text-gray-500' : 'text-gray-900'}`}>
-                            {task.title}
-                          </p>
-                          {task.project && (
-                            <p className="text-xs text-gray-500">
-                              Project: {task.project.title}
-                            </p>
-                          )}
-                          <div className="flex items-center space-x-2 mt-1">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityStyles(task.priority)}`}>
-                              {task.priority}
-                            </span>
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusStyles(task.status)}`}>
-                              {task.status.replace('_', ' ')}
-                            </span>
-                            {task.progress > 0 && (
-                              <span className="text-xs text-gray-500">
-                                {task.progress}% complete
+                <div className="space-y-3 max-h-96 overflow-y-auto custom-scrollbar">
+                  {tasks.slice(0, 10).map((task: Task, index) => (
+                    <div key={task.id} className="group p-4 border border-gray-200 rounded-xl hover:bg-gradient-to-r hover:from-gray-50 hover:to-white hover:shadow-md transition-all duration-300 hover:border-primary-200">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4 flex-1 min-w-0">
+                          {/* Task Status Button */}
+                          <div className="flex-shrink-0">
+                            {task.status === 'completed' ? (
+                              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                <CheckCircle className="w-5 h-5 text-green-600" />
+                              </div>
+                            ) : task.canComplete ? (
+                              <button
+                                onClick={() => updateTaskStatus(task.id, 'completed')}
+                                className="w-8 h-8 bg-primary-100 hover:bg-primary-200 rounded-full flex items-center justify-center transition-colors duration-200 group"
+                                title={task.completionReason}
+                              >
+                                <Circle className="w-5 h-5 text-primary-600 group-hover:text-primary-700" />
+                              </button>
+                            ) : (
+                              <div 
+                                className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center cursor-not-allowed"
+                                title={task.completionReason}
+                              >
+                                <AlertCircle className="w-5 h-5 text-gray-400" />
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Task Content */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center space-x-3 mb-2">
+                              <h4 className={`font-medium text-sm ${task.status === 'completed' ? 'line-through text-gray-500' : 'text-gray-900'} font-jura`}>
+                                {task.title}
+                              </h4>
+                              {task.project && (
+                                <span className="inline-flex items-center px-2 py-1 rounded-md bg-blue-50 text-blue-700 text-xs font-medium">
+                                  {task.project.title}
+                                </span>
+                              )}
+                            </div>
+                            
+                            <div className="flex items-center space-x-2 flex-wrap">
+                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityStyles(task.priority)}`}>
+                                {task.priority}
                               </span>
+                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusStyles(task.status)}`}>
+                                {task.status.replace('_', ' ')}
+                              </span>
+                              {task.progress > 0 && (
+                                <div className="flex items-center space-x-1">
+                                  <div className="w-12 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                    <div 
+                                      className="h-full bg-gradient-to-r from-primary-500 to-primary-600 rounded-full transition-all duration-300"
+                                      style={{ width: `${task.progress}%` }}
+                                    ></div>
+                                  </div>
+                                  <span className="text-xs text-gray-500 font-medium">{task.progress}%</span>
+                                </div>
+                              )}
+                              {task.assignedMembers && task.assignedMembers.length > 0 && (
+                                <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 text-xs font-medium">
+                                  <User className="w-3 h-3 mr-1" />
+                                  {task.assignedMembers.length}
+                                </span>
+                              )}
+                            </div>
+                            
+                            {task.completionReason && (
+                              <p className="text-xs text-gray-500 mt-1 italic">{task.completionReason}</p>
                             )}
                           </div>
                         </div>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        {task.status !== 'completed' ? (
-                          <>
-                            <Link
-                              href={`/tasks/${task.id}/edit`}
-                              className="text-blue-600 hover:text-blue-800 text-sm"
-                            >
-                              Edit
-                            </Link>
-                            <button
-                              onClick={() => {
-                                if (confirm('Are you sure you want to delete this task?')) {
-                                  deleteTask(task.id)
-                                }
-                              }}
-                              className="text-red-600 hover:text-red-800 text-sm"
-                            >
-                              Delete
-                            </button>
-                          </>
-                        ) : (
-                          <span className="text-gray-400 text-sm">Task completed</span>
-                        )}
+
+                        {/* Action Buttons */}
+                        <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                          {task.status !== 'completed' ? (
+                            <>
+                              <Link
+                                href={`/tasks/${task.id}/edit`}
+                                className="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all duration-200"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                              </Link>
+                              <button
+                                onClick={() => {
+                                  if (confirm('Are you sure you want to delete this task?')) {
+                                    deleteTask(task.id)
+                                  }
+                                }}
+                                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                              </button>
+                            </>
+                          ) : (
+                            <span className="text-green-600 text-xs font-medium bg-green-50 px-3 py-1 rounded-full">
+                              ✓ Completed
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -444,52 +597,103 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Projects Overview */}
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">Your Projects</h3>
-              <Link
-                href="/projects/create"
-                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-              >
-                New Project
-              </Link>
+          {/* Projects Overview - Modern Design */}
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+            <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--primary-600, #007f6d)' }}>
+                    <TrendingUp className="w-4 h-4 text-white" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-900 font-jura">Your Projects</h3>
+                  <span className="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                    {projects.length} active
+                  </span>
+                </div>
+                <Link
+                  href="/projects/create"
+                  className="inline-flex items-center text-sm font-medium text-purple-600 hover:text-purple-700 transition-colors duration-200"
+                >
+                  <Plus className="w-4 h-4 mr-1" />
+                  New Project
+                </Link>
+              </div>
             </div>
             <div className="p-6">
               {projects.length === 0 ? (
-                <div className="text-center py-8">
-                  <TrendingUp className="mx-auto h-12 w-12 text-gray-400" />
-                  <h3 className="mt-2 text-sm font-medium text-gray-900">No projects yet</h3>
-                  <p className="mt-1 text-sm text-gray-500">Create your first project to get started.</p>
-                  <div className="mt-6">
-                    <Link
-                      href="/projects/create"
-                      className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      New Project
-                    </Link>
+                <div className="text-center py-12">
+                  <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <TrendingUp className="h-10 w-10 text-purple-500" />
                   </div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2 font-jura">No projects yet</h3>
+                  <p className="text-gray-600 mb-6 max-w-sm mx-auto">Organize your tasks by creating your first project!</p>
+                  <Link
+                    href="/projects/create"
+                    className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-medium rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
+                  >
+                    <Plus className="w-5 h-5 mr-2" />
+                    Create Your First Project
+                  </Link>
                 </div>
               ) : (
-                <div className="space-y-4 max-h-96 overflow-y-auto">
-                  {projects.map((project) => (
-                    <div key={project.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer" onClick={() => router.push(`/projects/${project.id}`)}>
-                      <div className="flex justify-between items-start mb-2">
-                        <h4 className="text-sm font-medium text-gray-900">{project.title}</h4>
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(project.status)}`}>
+                <div className="space-y-4 max-h-96 overflow-y-auto custom-scrollbar">
+                  {projects.map((project: Project) => (
+                    <div 
+                      key={project.id} 
+                      className="group p-4 border border-gray-200 rounded-xl hover:bg-gradient-to-r hover:from-gray-50 hover:to-white hover:shadow-md transition-all duration-300 cursor-pointer hover:border-purple-200" 
+                      onClick={() => router.push(`/projects/${project.id}`)}
+                    >
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                            {project.title.charAt(0).toUpperCase()}
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-gray-900 group-hover:text-purple-700 transition-colors duration-200 font-jura">
+                              {project.title}
+                            </h4>
+                            <p className="text-xs text-gray-500 mt-1">
+                              Created {new Date(project.created_at).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(project.status)}`}>
                           {project.status}
                         </span>
                       </div>
-                      <div className="flex justify-between text-xs text-gray-500 mb-2">
-                        <span>{project.tasks_count} tasks</span>
-                        <span>{project.completed_tasks} completed</span>
+                      
+                      <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
+                        <div className="flex items-center space-x-4">
+                          <span className="flex items-center">
+                            <Circle className="w-3 h-3 mr-1" />
+                            {project.tasks_count || 0} tasks
+                          </span>
+                          <span className="flex items-center">
+                            <CheckCircle className="w-3 h-3 mr-1 text-green-500" />
+                            {project.completed_tasks || 0} done
+                          </span>
+                        </div>
+                        <span className="font-medium text-purple-600">
+                          {Math.round(project.progress || 0)}% complete
+                        </span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
+                      
+                      <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
                         <div
-                          className="bg-blue-600 h-2 rounded-full"
-                          style={{ width: `${project.progress}%` }}
+                          className="bg-gradient-to-r from-purple-500 to-purple-600 h-full rounded-full transition-all duration-500 ease-out"
+                          style={{ width: `${project.progress || 0}%` }}
                         ></div>
+                      </div>
+                      
+                      <div className="mt-3 flex items-center justify-between">
+                        <div className="text-xs text-gray-500">
+                          Last updated {new Date(project.updated_at).toLocaleDateString()}
+                        </div>
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                          <span className="text-xs text-purple-600 font-medium">
+                            Click to view →
+                          </span>
+                        </div>
                       </div>
                     </div>
                   ))}

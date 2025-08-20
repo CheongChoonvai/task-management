@@ -1,14 +1,162 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Jura:wght@400;500;700&display=swap');
+
+body {
+  font-family: 'Jura', sans-serif;
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #007f6d, #008774);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #006557, #007f6d);
+}
+
+/* Smooth animations */
+.hover-lift {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Glass morphism effect */
+.glass {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.8);
+}
 
 :root {
+/* Utility class for Jura font */
+.font-jura {
+  font-family: 'Jura', sans-serif;
+}
+
+/* Disabled button styling for consistent branding */
+button:disabled, .btn:disabled {
+  background-color: var(--primary-600, #007f6d) !important;
+  color: #fff !important;
+  opacity: 0.5;
+  cursor: not-allowed;
+  font-family: 'Jura', sans-serif;
+}
   /* Colors - Design System */
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Brand Colors - primary palette (shades) */
+  --primary-50:  #e6f6f4;
+  --primary-100: #d9f2ef;
+  --primary-200: #b0e4dd;
+  --primary-300: #00a991;
+  --primary-400: #009883;
+  --primary-500: #008774;
+  --primary-600: #007f6d;
+  --primary-700: #006557;
+  --primary-800: #004c41;
+  --primary-900: #004c41;
+
+  --primary: var(--primary-500);
+  --primary-hover: var(--primary-600);
+  --primary-light: var(--primary-100);
   
-  /* Brand Colors */
-  --primary: #3b82f6;
-  --primary-hover: #2563eb;
-  --primary-light: #dbeafe;
+  /* Green palette (semantic) */
+  --green-50:  #f0fdf4;
+  --green-100: #dcfce7;
+  --green-200: #bbf7d0;
+  --green-300: #86efac;
+  --green-400: #4ade80;
+  --green-500: #22c55e;
+  --green-600: #16a34a;
+  --green-700: #15803d;
+  --green-800: #166534;
+  --green-900: #14532d;
+
+  /* Blue palette */
+  --blue-50:  #eff6ff;
+  --blue-100: #dbeafe;
+  --blue-200: #bfdbfe;
+  --blue-300: #93c5fd;
+  --blue-400: #60a5fa;
+  --blue-500: #3b82f6;
+  --blue-600: #2563eb;
+  --blue-700: #1d4ed8;
+  --blue-800: #1e40af;
+  --blue-900: #1e3a8a;
+
+  /* Red palette */
+  --red-50:  #fff1f2;
+  --red-100: #ffe4e6;
+  --red-200: #fecaca;
+  --red-300: #fca5a5;
+  --red-400: #f87171;
+  --red-500: #ef4444;
+  --red-600: #dc2626;
+  --red-700: #b91c1c;
+  --red-800: #991b1b;
+  --red-900: #7f1d1d;
+
+  /* Yellow palette */
+  --yellow-50:  #fffbeb;
+  --yellow-100: #fef3c7;
+  --yellow-200: #fde68a;
+  --yellow-300: #fcd34d;
+  --yellow-400: #fbbf24;
+  --yellow-500: #f59e0b;
+  --yellow-600: #d97706;
+  --yellow-700: #b45309;
+  --yellow-800: #92400e;
+  --yellow-900: #78350f;
+
+  /* Soft Autumn palette */
+  --autumn-50:  #fef7f0;
+  --autumn-100: #fdf0e4;
+  --autumn-200: #fae1ca;
+  --autumn-300: #f6c89f;
+  --autumn-400: #f1a973;
+  --autumn-500: #e8954a;
+  --autumn-600: #d4792f;
+  --autumn-700: #b86125;
+  --autumn-800: #954e21;
+  --autumn-900: #7a421f;
+
+  /* Orange palette (complement to autumn) */
+  --orange-50:  #fff7ed;
+  --orange-100: #ffedd5;
+  --orange-200: #fed7aa;
+  --orange-300: #fdba74;
+  --orange-400: #fb923c;
+  --orange-500: #f97316;
+  --orange-600: #ea580c;
+  --orange-700: #c2410c;
+  --orange-800: #9a3412;
+  --orange-900: #7c2d12;
+
+  /* Warm Brown palette */
+  --brown-50:  #fdf8f6;
+  --brown-100: #f2e8e5;
+  --brown-200: #eaddd7;
+  --brown-300: #e0cfc4;
+  --brown-400: #d2bab0;
+  --brown-500: #bfa094;
+  --brown-600: #a18072;
+  --brown-700: #8b6f47;
+  --brown-800: #746025;
+  --brown-900: #5d4e1f;
   
   /* Semantic Colors */
   --success: #10b981;
@@ -17,6 +165,9 @@
   --warning-light: #fef3c7;
   --error: #ef4444;
   --error-light: #fee2e2;
+
+  /* Surface */
+  --surface: #f9fafb;
   
   /* Neutral Colors */
   --gray-50: #f9fafb;
@@ -72,50 +223,30 @@
   --radius-full: 9999px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-primary-hover: var(--primary-hover);
-  --color-primary-light: var(--primary-light);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  
-  /* Custom spacing utilities for 8pt grid */
-  --spacing-1: var(--space-1);
-  --spacing-2: var(--space-2);
-  --spacing-3: var(--space-3);
-  --spacing-4: var(--space-4);
-  --spacing-5: var(--space-5);
-  --spacing-6: var(--space-6);
-  --spacing-8: var(--space-8);
-  --spacing-10: var(--space-10);
-  --spacing-12: var(--space-12);
-  --spacing-16: var(--space-16);
-  --spacing-20: var(--space-20);
-  --spacing-24: var(--space-24);
-}
+/* design tokens are declared as CSS variables above; no special @theme rules required */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --gray-50: #1f2937;
-    --gray-100: #374151;
-    --gray-200: #4b5563;
-    --gray-300: #6b7280;
-    --gray-400: #9ca3af;
-    --gray-500: #d1d5db;
-    --gray-600: #e5e7eb;
-    --gray-700: #f3f4f6;
-    --gray-800: #f9fafb;
-    --gray-900: #ffffff;
-  }
+/* Dark theme activated via `data-theme="dark"` on <html> or <body> */
+[data-theme="dark"] {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --gray-50: #1f2937;
+  --gray-100: #374151;
+  --gray-200: #4b5563;
+  --gray-300: #6b7280;
+  --gray-400: #9ca3af;
+  --gray-500: #d1d5db;
+  --gray-600: #e5e7eb;
+  --gray-700: #f3f4f6;
+  --gray-800: #f9fafb;
+  --gray-900: #ffffff;
+
+  /* If you want different primary shades in dark mode, override them here. */
+  /* --primary-500: #00a991; */
 }
 
 /* Global Styles */
 body {
-  font-family: var(--font-sans);
+  font-family: var(--font-jura), var(--font-sans), Arial, Helvetica, sans-serif;
   line-height: 1.6;
   color: var(--foreground);
   background-color: var(--background);
@@ -123,14 +254,14 @@ body {
 
 /* Component Classes */
 .card {
-  background: white;
+  background: var(--gray-50);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
   border: 1px solid var(--gray-200);
 }
 
 .card-elevated {
-  background: white;
+  background: var(--gray-50);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   border: none;
@@ -155,18 +286,18 @@ body {
 
 .btn-secondary {
   background-color: transparent;
-  color: var(--gray-700);
+  color: var(--primary);
   padding: var(--space-3) var(--space-6);
   border-radius: var(--radius-md);
   font-weight: 500;
   transition: all 0.2s ease;
-  border: 1px solid var(--gray-300);
+  border: 1px solid var(--primary);
   cursor: pointer;
 }
 
 .btn-secondary:hover {
-  background-color: var(--gray-50);
-  border-color: var(--gray-400);
+  background-color: var(--primary-light);
+  border-color: var(--primary-600);
 }
 
 /* Layout Classes */
@@ -218,8 +349,229 @@ body {
   outline-offset: 2px;
 }
 
+/* Replace bright white panels from Tailwind's bg-white with a softer surface color */
+[class*="bg-white"] {
+  background-color: var(--gray-50) !important;
+}
+
+/* Specific utility to catch bg-white with opacity variants (e.g. bg-white/80) */
+.bg-white {
+  background-color: var(--gray-50) !important;
+}
+
+/* Autumn color utilities */
+.text-autumn-50 { color: var(--autumn-50); }
+.text-autumn-100 { color: var(--autumn-100); }
+.text-autumn-200 { color: var(--autumn-200); }
+.text-autumn-300 { color: var(--autumn-300); }
+.text-autumn-400 { color: var(--autumn-400); }
+.text-autumn-500 { color: var(--autumn-500); }
+.text-autumn-600 { color: var(--autumn-600); }
+.text-autumn-700 { color: var(--autumn-700); }
+.text-autumn-800 { color: var(--autumn-800); }
+.text-autumn-900 { color: var(--autumn-900); }
+
+.bg-autumn-50 { background-color: var(--autumn-50); }
+.bg-autumn-100 { background-color: var(--autumn-100); }
+.bg-autumn-200 { background-color: var(--autumn-200); }
+.bg-autumn-300 { background-color: var(--autumn-300); }
+.bg-autumn-400 { background-color: var(--autumn-400); }
+.bg-autumn-500 { background-color: var(--autumn-500); }
+.bg-autumn-600 { background-color: var(--autumn-600); }
+.bg-autumn-700 { background-color: var(--autumn-700); }
+.bg-autumn-800 { background-color: var(--autumn-800); }
+.bg-autumn-900 { background-color: var(--autumn-900); }
+
+/* Orange color utilities */
+.text-orange-50 { color: var(--orange-50); }
+.text-orange-100 { color: var(--orange-100); }
+.text-orange-200 { color: var(--orange-200); }
+.text-orange-300 { color: var(--orange-300); }
+.text-orange-400 { color: var(--orange-400); }
+.text-orange-500 { color: var(--orange-500); }
+.text-orange-600 { color: var(--orange-600); }
+.text-orange-700 { color: var(--orange-700); }
+.text-orange-800 { color: var(--orange-800); }
+.text-orange-900 { color: var(--orange-900); }
+
+.bg-orange-50 { background-color: var(--orange-50); }
+.bg-orange-100 { background-color: var(--orange-100); }
+.bg-orange-200 { background-color: var(--orange-200); }
+.bg-orange-300 { background-color: var(--orange-300); }
+.bg-orange-400 { background-color: var(--orange-400); }
+.bg-orange-500 { background-color: var(--orange-500); }
+.bg-orange-600 { background-color: var(--orange-600); }
+.bg-orange-700 { background-color: var(--orange-700); }
+.bg-orange-800 { background-color: var(--orange-800); }
+.bg-orange-900 { background-color: var(--orange-900); }
+
+/* Brown color utilities */
+.text-brown-50 { color: var(--brown-50); }
+.text-brown-100 { color: var(--brown-100); }
+.text-brown-200 { color: var(--brown-200); }
+.text-brown-300 { color: var(--brown-300); }
+.text-brown-400 { color: var(--brown-400); }
+.text-brown-500 { color: var(--brown-500); }
+.text-brown-600 { color: var(--brown-600); }
+.text-brown-700 { color: var(--brown-700); }
+.text-brown-800 { color: var(--brown-800); }
+.text-brown-900 { color: var(--brown-900); }
+
+.bg-brown-50 { background-color: var(--brown-50); }
+.bg-brown-100 { background-color: var(--brown-100); }
+.bg-brown-200 { background-color: var(--brown-200); }
+.bg-brown-300 { background-color: var(--brown-300); }
+.bg-brown-400 { background-color: var(--brown-400); }
+.bg-brown-500 { background-color: var(--brown-500); }
+.bg-brown-600 { background-color: var(--brown-600); }
+.bg-brown-700 { background-color: var(--brown-700); }
+.bg-brown-800 { background-color: var(--brown-800); }
+.bg-brown-900 { background-color: var(--brown-900); }
+
+/* Hover utilities for autumn colors */
+.hover\:bg-autumn-600:hover { background-color: var(--autumn-600); }
+.hover\:bg-autumn-700:hover { background-color: var(--autumn-700); }
+.hover\:bg-orange-600:hover { background-color: var(--orange-600); }
+.hover\:bg-brown-600:hover { background-color: var(--brown-600); }
+.hover\:text-autumn-700:hover { color: var(--autumn-700); }
+.hover\:text-autumn-800:hover { color: var(--autumn-800); }
+
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+}
+
+/* React Big Calendar Customization */
+.rbc-calendar {
+  font-family: 'Jura', sans-serif !important;
+}
+
+.rbc-header {
+  padding: 12px 8px;
+  font-weight: 500;
+  background: linear-gradient(to right, #fef7f0, #fdf0e4);
+  border-bottom: 2px solid #e2e8f0;
+  color: #374151;
+}
+
+.rbc-month-view, .rbc-time-view {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.rbc-today {
+  background-color: rgba(212, 121, 47, 0.1) !important;
+}
+
+.rbc-off-range-bg {
+  background-color: #f9fafb;
+}
+
+.rbc-date-cell {
+  padding: 8px;
+  font-weight: 500;
+}
+
+.rbc-date-cell.rbc-now {
+  font-weight: 700;
+  color: var(--autumn-600, #d4792f);
+}
+
+.rbc-event {
+  border-radius: 6px !important;
+  border: none !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  padding: 2px 6px !important;
+  margin: 1px 0 !important;
+}
+
+.rbc-event:focus {
+  outline: 2px solid var(--autumn-400, #f1a973);
+  outline-offset: 1px;
+}
+
+.rbc-slot-selection {
+  background-color: rgba(212, 121, 47, 0.2);
+}
+
+.rbc-day-slot .rbc-time-slot {
+  border-top: 1px solid #f3f4f6;
+}
+
+.rbc-time-header {
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.rbc-time-content {
+  border: 1px solid #e5e7eb;
+}
+
+.rbc-current-time-indicator {
+  background-color: var(--autumn-600, #d4792f);
+  height: 2px;
+}
+
+.rbc-toolbar {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: linear-gradient(to right, #fef7f0, #fdf0e4);
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.rbc-toolbar button {
+  padding: 8px 16px;
+  border: 1px solid #d1d5db;
+  background: white;
+  color: #374151;
+  border-radius: 8px;
+  font-weight: 500;
+  font-family: 'Jura', sans-serif;
+  transition: all 0.2s ease;
+}
+
+.rbc-toolbar button:hover {
+  background: var(--autumn-50, #fef7f0);
+  border-color: var(--autumn-300, #f6c89f);
+  color: var(--autumn-700, #b86125);
+}
+
+.rbc-toolbar button.rbc-active {
+  background: var(--autumn-600, #d4792f);
+  border-color: var(--autumn-600, #d4792f);
+  color: white;
+}
+
+.rbc-toolbar-label {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+  font-family: 'Jura', sans-serif;
+}
+
+.rbc-show-more {
+  background-color: var(--autumn-100, #fdf0e4);
+  color: var(--autumn-700, #b86125);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.rbc-overlay {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.rbc-overlay-header {
+  background: linear-gradient(to right, #fef7f0, #fdf0e4);
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  font-weight: 600;
+  color: #374151;
 }

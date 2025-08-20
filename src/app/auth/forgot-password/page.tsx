@@ -36,7 +36,7 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+  <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-50">
       {/* Back to Login */}
       <div className="absolute top-6 left-6 z-10">
         <Link
@@ -53,10 +53,10 @@ export default function ResetPasswordPage() {
           {/* Header */}
           <div className="text-center">
             <div className="flex items-center justify-center space-x-2 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-gradient-to-r from-primary-600 to-primary-700 rounded-xl flex items-center justify-center">
                 <Mail className="w-7 h-7 text-white" />
               </div>
-              <span className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              <span className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent">
                 TaskFlow
               </span>
             </div>
@@ -83,7 +83,7 @@ export default function ResetPasswordPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200"
                     placeholder="Enter your email address"
                   />
                 </div>
@@ -106,7 +106,7 @@ export default function ResetPasswordPage() {
                 <button
                   type="submit"
                   disabled={loading || !email}
-                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-4 rounded-xl hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-all duration-200 transform hover:scale-105 hover:shadow-lg disabled:hover:scale-100 disabled:hover:shadow-none flex items-center justify-center"
+                  className="w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white py-3 px-4 rounded-xl hover:from-primary-700 hover:to-primary-800 disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-all duration-200 transform hover:scale-105 hover:shadow-lg disabled:hover:scale-100 disabled:hover:shadow-none flex items-center justify-center"
                 >
                   {loading ? (
                     <>
@@ -153,7 +153,7 @@ export default function ResetPasswordPage() {
                   
                   <Link
                     href="/login"
-                    className="block w-full text-center text-blue-600 hover:text-blue-800 py-2 transition-colors"
+                    className="block w-full text-center text-primary-600 hover:text-primary-800 py-2 transition-colors"
                   >
                     Back to Login
                   </Link>
@@ -166,7 +166,7 @@ export default function ResetPasswordPage() {
           <div className="text-center">
             <p className="text-sm text-gray-500">
               Remember your password?{' '}
-              <Link href="/login" className="text-blue-600 hover:text-blue-800 font-medium">
+              <Link href="/login" className="text-primary-600 hover:text-primary-800 font-medium">
                 Sign in here
               </Link>
             </p>

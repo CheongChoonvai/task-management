@@ -46,7 +46,7 @@ export default function UserSearchBar({ onSelectUser }: UserSearchBarProps) {
     <div className="w-full max-w-md mx-auto">
       <input
         type="text"
-        className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500"
+  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500"
         value={searchTerm}
         onChange={e => setSearchTerm(e.target.value)}
         placeholder="Search users by name or email..."
@@ -54,14 +54,14 @@ export default function UserSearchBar({ onSelectUser }: UserSearchBarProps) {
       {loading && <div className="mt-2 text-sm text-gray-500">Searching...</div>}
       {error && <div className="mt-2 text-sm text-red-600">{error}</div>}
       {searchResults.length > 0 && (
-        <ul className="mt-2 bg-white border border-gray-200 rounded-xl max-h-60 overflow-y-auto shadow">
+  <ul className="mt-2 bg-surface border border-gray-200 rounded-xl max-h-60 overflow-y-auto shadow">
           {searchResults.map(u => (
-            <li key={u.id} className="flex items-center justify-between px-3 py-2 hover:bg-blue-50">
+            <li key={u.id} className="flex items-center justify-between px-3 py-2 hover:bg-primary-50">
               <span>{u.full_name || u.email}</span>
               {onSelectUser && (
                 <button
                   type="button"
-                  className="text-blue-600 hover:text-blue-800 text-xs font-medium"
+                  className="text-primary-600 hover:text-primary-800 text-xs font-medium"
                   onClick={() => onSelectUser(u)}
                 >Select</button>
               )}

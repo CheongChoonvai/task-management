@@ -196,10 +196,10 @@ export default function CreateTaskPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Please sign in</h1>
-          <Link href="/login" className="text-blue-600 hover:text-blue-800">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4 font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>Please sign in</h1>
+          <Link href="/login" className="text-primary-600 hover:text-primary-800 font-jura" style={{ color: 'var(--primary-600, #007f6d)', fontFamily: 'Jura, sans-serif' }}>
             Go to login
           </Link>
         </div>
@@ -208,36 +208,37 @@ export default function CreateTaskPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+  <div className="min-h-screen bg-gray-50 font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div className="bg-surface shadow-sm border-b border-gray-200">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
           <div className="flex items-center py-6">
             <Link
               href="/dashboard"
-              className="flex items-center text-gray-600 hover:text-gray-900 mr-4"
+              className="flex items-center text-primary-600 hover:text-primary-800 font-jura mr-4"
+              style={{ color: 'var(--primary-600, #007f6d)', fontFamily: 'Jura, sans-serif' }}
             >
-              <ArrowLeft className="w-5 h-5 mr-1" />
+              <ArrowLeft className="w-5 h-5 mr-1 text-primary-600" style={{ color: 'var(--primary-600, #007f6d)' }} />
               Back to Dashboard
             </Link>
-            <h1 className="text-3xl font-bold text-gray-900">Create New Task</h1>
+            <h1 className="text-3xl font-bold text-primary-600 font-jura" style={{ color: 'var(--primary-600, #007f6d)', fontFamily: 'Jura, sans-serif' }}>Create New Task</h1>
           </div>
         </div>
       </div>
 
       {/* Form */}
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white shadow rounded-lg">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-6">
+  <div className="bg-surface shadow rounded-lg">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-6 font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
             {/* Title */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Task Title *
+                <span className="font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>Task Title <span className="text-primary-600">*</span></span>
               </label>
               <input
                 type="text"
                 {...register('title')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 font-jura"
                 placeholder="Enter task title"
               />
               {errors.title && (
@@ -248,12 +249,12 @@ export default function CreateTaskPage() {
             {/* Description */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Description
+                <span className="font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>Description</span>
               </label>
               <textarea
                 {...register('description')}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 font-jura"
                 placeholder="Describe what needs to be done..."
               />
               {errors.description && (
@@ -264,12 +265,12 @@ export default function CreateTaskPage() {
             {/* Project Selection (Required) */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                <TrendingUp className="w-4 h-4 inline mr-1" />
-                Project *
+                <TrendingUp className="w-4 h-4 inline mr-1 text-primary-600" style={{ color: 'var(--primary-600, #007f6d)' }} />
+                <span className="font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>Project <span className="text-primary-600">*</span></span>
               </label>
               <select
                 {...register('project_id')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 font-jura"
               >
                 <option value="">Select a project</option>
                 {projects.map((project) => (
@@ -280,7 +281,7 @@ export default function CreateTaskPage() {
               </select>
               {projects.length === 0 && (
                 <p className="mt-1 text-sm text-gray-500">
-                  No projects available. <Link href="/projects/create" className="text-blue-600 hover:text-blue-800">Create a project first</Link>
+                  No projects available. <Link href="/projects/create" className="text-primary-600 hover:text-primary-800 font-jura" style={{ color: 'var(--primary-600, #007f6d)', fontFamily: 'Jura, sans-serif' }}>Create a project first</Link>
                 </p>
               )}
               {errors.project_id && (
@@ -292,7 +293,7 @@ export default function CreateTaskPage() {
             {selectedProject && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Assign Members
+                  <span className="font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>Assign Members</span>
                 </label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   {projectMembers.map((pm) => (
@@ -301,7 +302,7 @@ export default function CreateTaskPage() {
                         type="checkbox"
                         value={pm.member_id}
                         {...register('assigned_members')}
-                        className="form-checkbox h-4 w-4 text-blue-600"
+                        className="form-checkbox h-4 w-4 text-primary-600"
                       />
                       <span>{pm.members?.full_name || pm.members?.email}</span>
                     </label>
@@ -317,11 +318,11 @@ export default function CreateTaskPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Status
+                  <span className="font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>Status</span>
                 </label>
                 <select
                   {...register('status')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 font-jura"
                 >
                   <option value="todo">To Do</option>
                   <option value="in_progress">In Progress</option>
@@ -334,11 +335,11 @@ export default function CreateTaskPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Priority
+                  <span className="font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>Priority</span>
                 </label>
                 <select
                   {...register('priority')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 font-jura"
                 >
                   <option value="low">Low</option>
                   <option value="medium">Medium</option>
@@ -353,13 +354,13 @@ export default function CreateTaskPage() {
             {/* Due Date */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                <Calendar className="w-4 h-4 inline mr-1" />
-                Due Date
+                <Calendar className="w-4 h-4 inline mr-1 text-primary-600" style={{ color: 'var(--primary-600, #007f6d)' }} />
+                <span className="font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>Due Date</span>
               </label>
               <input
                 type="datetime-local"
                 {...register('due_date')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 font-jura"
               />
               {errors.due_date && (
                 <p className="mt-1 text-sm text-red-600">{errors.due_date.message}</p>
@@ -370,14 +371,14 @@ export default function CreateTaskPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Initial Progress (%)
+                  <span className="font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>Initial Progress (%)</span>
                 </label>
                 <input
                   type="number"
                   min="0"
                   max="100"
                   {...register('progress', { valueAsNumber: true })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 font-jura"
                   placeholder="0"
                 />
                 {errors.progress && (
@@ -388,14 +389,14 @@ export default function CreateTaskPage() {
               {selectedProject && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Project Contribution (%)
+                    <span className="font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>Project Contribution (%)</span>
                   </label>
                   <input
                     type="number"
                     min="0"
                     max="100"
                     {...register('project_contribution', { valueAsNumber: true })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 font-jura"
                     placeholder="0"
                   />
                   <p className="mt-1 text-xs text-gray-500">
@@ -412,14 +413,16 @@ export default function CreateTaskPage() {
             <div className="flex justify-end space-x-3">
               <Link
                 href="/dashboard"
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 border border-gray-300 rounded-lg text-primary-600 hover:bg-primary-50 font-jura transition-colors"
+                style={{ color: 'var(--primary-600, #007f6d)', fontFamily: 'Jura, sans-serif', borderColor: 'var(--primary-600, #007f6d)' }}
               >
                 Cancel
               </Link>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-6 py-2 bg-primary-600 text-white rounded-lg font-jura hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                style={{ backgroundColor: 'var(--primary-600, #007f6d)', fontFamily: 'Jura, sans-serif' }}
               >
                 {isSubmitting ? 'Creating...' : 'Create Task'}
               </button>

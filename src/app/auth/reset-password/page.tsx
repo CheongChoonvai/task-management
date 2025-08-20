@@ -71,16 +71,16 @@ export default function ResetPasswordConfirmPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+  <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-50">
       <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           {/* Header */}
           <div className="text-center">
             <div className="flex items-center justify-center space-x-2 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-gradient-to-r from-primary-600 to-primary-700 rounded-xl flex items-center justify-center">
                 <Lock className="w-7 h-7 text-white" />
               </div>
-              <span className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              <span className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent">
                 TaskFlow
               </span>
             </div>
@@ -109,7 +109,7 @@ export default function ResetPasswordConfirmPage() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
-                      className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                      className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200"
                       placeholder="Enter your new password"
                     />
                     <button
@@ -138,7 +138,7 @@ export default function ResetPasswordConfirmPage() {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
-                      className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                      className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200"
                       placeholder="Confirm your new password"
                     />
                     <button
@@ -156,9 +156,9 @@ export default function ResetPasswordConfirmPage() {
                 </div>
 
                 {/* Password Requirements */}
-                <div className="bg-blue-50 rounded-lg p-4">
-                  <h4 className="text-sm font-medium text-blue-900 mb-2">Password Requirements:</h4>
-                  <ul className="text-xs text-blue-800 space-y-1">
+                <div className="bg-primary-50 rounded-lg p-4">
+                  <h4 className="text-sm font-medium text-primary-900 mb-2">Password Requirements:</h4>
+                  <ul className="text-xs text-primary-800 space-y-1">
                     <li className="flex items-center">
                       <span className={`w-1.5 h-1.5 rounded-full mr-2 ${password.length >= 6 ? 'bg-green-500' : 'bg-gray-300'}`}></span>
                       At least 6 characters long
@@ -188,7 +188,7 @@ export default function ResetPasswordConfirmPage() {
                 <button
                   type="submit"
                   disabled={loading || !password || !confirmPassword || password !== confirmPassword}
-                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 px-4 rounded-xl hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-all duration-200 transform hover:scale-105 hover:shadow-lg disabled:hover:scale-100 disabled:hover:shadow-none flex items-center justify-center"
+                  className="w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white py-3 px-4 rounded-xl hover:from-primary-700 hover:to-primary-800 disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-all duration-200 transform hover:scale-105 hover:shadow-lg disabled:hover:scale-100 disabled:hover:shadow-none flex items-center justify-center"
                 >
                   {loading ? (
                     <>

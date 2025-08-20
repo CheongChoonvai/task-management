@@ -148,7 +148,7 @@ export default function CreateProjectPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Please sign in</h1>
-          <Link href="/login" className="text-blue-600 hover:text-blue-800">
+          <Link href="/login" className="text-primary-600 hover:text-primary-800">
             Go to login
           </Link>
         </div>
@@ -159,7 +159,7 @@ export default function CreateProjectPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
+  <div className="bg-surface shadow-sm border-b border-gray-200">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center py-6">
             <Link
@@ -176,7 +176,7 @@ export default function CreateProjectPage() {
 
       {/* Form */}
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white shadow rounded-lg">
+  <div className="bg-surface shadow rounded-lg">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-6">
             {/* Title */}
             <div>
@@ -186,7 +186,7 @@ export default function CreateProjectPage() {
               <input
                 type="text"
                 {...register('title')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Enter project title"
               />
               {errors.title && (
@@ -199,12 +199,12 @@ export default function CreateProjectPage() {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Description
               </label>
-              <textarea
-                {...register('description')}
-                rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Describe the project goals and objectives..."
-              />
+                          <textarea
+                            {...register('description')}
+                            rows={4}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                            placeholder="Describe the project goals and objectives..."
+                          />
               {errors.description && (
                 <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>
               )}
@@ -218,7 +218,7 @@ export default function CreateProjectPage() {
                 </label>
                 <select
                   {...register('status')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 >
                   <option value="planning">Planning</option>
                   <option value="active">Active</option>
@@ -236,7 +236,7 @@ export default function CreateProjectPage() {
                 </label>
                 <select
                   {...register('priority')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 >
                   <option value="low">Low</option>
                   <option value="medium">Medium</option>
@@ -257,7 +257,7 @@ export default function CreateProjectPage() {
                 </label>
                 <select
                   {...register('lead_id')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 >
                   <option value="">Select a project lead</option>
                   {members.map((member) => (
@@ -279,7 +279,7 @@ export default function CreateProjectPage() {
                 <input
                   type="date"
                   {...register('deadline')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 />
                 {errors.deadline && (
                   <p className="mt-1 text-sm text-red-600">{errors.deadline.message}</p>
@@ -306,7 +306,7 @@ export default function CreateProjectPage() {
                       type="checkbox"
                       value={member.id}
                       {...register('members')}
-                      className="form-checkbox h-4 w-4 text-blue-600"
+                      className="form-checkbox h-4 w-4 text-primary-600"
                     />
                     <span>{member.full_name || member.email}</span>
                   </label>
@@ -333,7 +333,7 @@ export default function CreateProjectPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {isSubmitting ? 'Creating...' : 'Create Project'}
               </button>

@@ -201,7 +201,7 @@ export default function EditTaskPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Please sign in</h1>
-          <Link href="/login" className="text-blue-600 hover:text-blue-800">
+          <Link href="/login" className="text-primary-600 hover:text-primary-800">
             Go to login
           </Link>
         </div>
@@ -212,7 +212,7 @@ export default function EditTaskPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
       </div>
     )
   }
@@ -220,7 +220,7 @@ export default function EditTaskPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
+  <div className="bg-surface shadow-sm border-b border-gray-200">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center py-6">
             <Link
@@ -237,7 +237,7 @@ export default function EditTaskPage() {
 
       {/* Form */}
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white shadow rounded-lg">
+  <div className="bg-surface shadow rounded-lg">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-6">
             {/* Title */}
             <div>
@@ -247,7 +247,7 @@ export default function EditTaskPage() {
               <input
                 type="text"
                 {...register('title')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Enter task title"
               />
               {errors.title && (
@@ -263,7 +263,7 @@ export default function EditTaskPage() {
               <textarea
                 {...register('description')}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 placeholder="Describe what needs to be done..."
               />
               {errors.description && (
@@ -279,7 +279,7 @@ export default function EditTaskPage() {
               </label>
               <select
                 {...register('project_id')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               >
                 <option value="">No project (standalone task)</option>
                 {projects.map((project) => (
@@ -301,7 +301,7 @@ export default function EditTaskPage() {
                 </label>
                 <select
                   {...register('status')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 >
                   <option value="todo">To Do</option>
                   <option value="in_progress">In Progress</option>
@@ -318,7 +318,7 @@ export default function EditTaskPage() {
                 </label>
                 <select
                   {...register('priority')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 >
                   <option value="low">Low</option>
                   <option value="medium">Medium</option>
@@ -339,7 +339,7 @@ export default function EditTaskPage() {
               <input
                 type="datetime-local"
                 {...register('due_date')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               />
               {errors.due_date && (
                 <p className="mt-1 text-sm text-red-600">{errors.due_date.message}</p>
@@ -357,7 +357,7 @@ export default function EditTaskPage() {
                   min="0"
                   max="100"
                   {...register('progress', { valueAsNumber: true })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                   placeholder="0"
                 />
                 {errors.progress && (
@@ -375,7 +375,7 @@ export default function EditTaskPage() {
                     min="0"
                     max="100"
                     {...register('project_contribution', { valueAsNumber: true })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     placeholder="0"
                   />
                   <p className="mt-1 text-xs text-gray-500">
@@ -393,21 +393,24 @@ export default function EditTaskPage() {
               <button
                 type="button"
                 onClick={handleDelete}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-jura"
+                style={{ backgroundColor: '#dc2626', color: '#fff', fontFamily: 'Jura, sans-serif' }}
               >
                 Delete Task
               </button>
               <div className="flex space-x-3">
                 <Link
                   href="/dashboard"
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 border border-primary-300 rounded-lg text-primary-700 hover:bg-primary-50 transition-colors font-jura"
+                  style={{ fontFamily: 'Jura, sans-serif' }}
                 >
                   Cancel
                 </Link>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-jura"
+                  style={{ fontFamily: 'Jura, sans-serif' }}
                 >
                   {isSubmitting ? 'Updating...' : 'Update Task'}
                 </button>

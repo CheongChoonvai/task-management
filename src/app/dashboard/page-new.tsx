@@ -199,7 +199,7 @@ export default function DashboardPage() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed': return <CheckCircle className="w-5 h-5 text-green-500" />
-      case 'in_progress': return <Clock className="w-5 h-5 text-blue-500" />
+  case 'in_progress': return <Clock className="w-5 h-5 text-primary-500" />
       default: return <Circle className="w-5 h-5 text-gray-400" />
     }
   }
@@ -216,7 +216,7 @@ export default function DashboardPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed': return 'bg-green-100 text-green-800'
-      case 'in_progress': return 'bg-blue-100 text-blue-800'
+  case 'in_progress': return 'bg-primary-100 text-primary-800'
       case 'todo': return 'bg-gray-100 text-gray-800'
       default: return 'bg-gray-100 text-gray-800'
     }
@@ -231,7 +231,7 @@ export default function DashboardPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Please sign in</h1>
-          <Link href="/login" className="text-blue-600 hover:text-blue-800">
+          <Link href="/login" className="text-primary-600 hover:text-primary-800">
             Go to login
           </Link>
         </div>
@@ -260,7 +260,7 @@ export default function DashboardPage() {
               </Link>
               <Link
                 href="/tasks/create"
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 New Task
@@ -300,7 +300,7 @@ export default function DashboardPage() {
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <Clock className="h-6 w-6 text-blue-400" />
+                  <Clock className="h-6 w-6 text-primary-400" />
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
@@ -354,7 +354,7 @@ export default function DashboardPage() {
             <div className="p-6">
               {loading ? (
                 <div className="text-center py-4">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600 mx-auto"></div>
                 </div>
               ) : tasks.length === 0 ? (
                 <div className="text-center py-8">
@@ -364,7 +364,7 @@ export default function DashboardPage() {
                   <div className="mt-6">
                     <Link
                       href="/tasks/create"
-                      className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                      className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700"
                     >
                       <Plus className="w-4 h-4 mr-2" />
                       New Task
@@ -408,7 +408,7 @@ export default function DashboardPage() {
                       <div className="flex items-center space-x-2">
                         <Link
                           href={`/tasks/${task.id}/edit`}
-                          className="text-blue-600 hover:text-blue-800 text-sm"
+                          className="text-primary-600 hover:text-primary-800 text-sm"
                         >
                           Edit
                         </Link>
@@ -432,7 +432,7 @@ export default function DashboardPage() {
               <h3 className="text-lg leading-6 font-medium text-gray-900">Your Projects</h3>
               <Link
                 href="/projects/create"
-                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                className="text-primary-600 hover:text-primary-800 text-sm font-medium"
               >
                 New Project
               </Link>
@@ -446,7 +446,7 @@ export default function DashboardPage() {
                   <div className="mt-6">
                     <Link
                       href="/projects/create"
-                      className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                      className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700"
                     >
                       <Plus className="w-4 h-4 mr-2" />
                       New Project
@@ -469,7 +469,7 @@ export default function DashboardPage() {
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
                         <div
-                          className="bg-blue-600 h-2 rounded-full"
+                          className="bg-primary-600 h-2 rounded-full"
                           style={{ width: `${project.progress}%` }}
                         ></div>
                       </div>
