@@ -1,15 +1,24 @@
 'use client'
 
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { AlertCircle, ArrowLeft } from 'lucide-react'
-import { useSearchParams } from 'next/navigation'
 
 export const dynamic = 'force-dynamic'
 
 export default function AuthCodeErrorPage() {
-  const searchParams = useSearchParams()
-  const error = searchParams?.get('error')
-  const description = searchParams?.get('description')
+  const [error, setError] = useState<string | null>(null)
+  const [description, setDescription] = useState<string | null>(null)
+
+  useEffect(() => {
+    try {
+      const sp = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '')
+      setError(sp.get('error'))
+      setDescription(sp.get('description'))
+    } catch (e) {
+      // If anything goes wrong, leave values as null
+    }
+  }, [])
 
   return (
   <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-50">

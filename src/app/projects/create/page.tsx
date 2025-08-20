@@ -52,20 +52,16 @@ export default function CreateProjectPage() {
 
   useEffect(() => {
     if (user) {
-      fetchMembers()
+  fetchMembers()
     }
   }, [user])
 
   const fetchMembers = async () => {
     try {
-      const { data, error } = await supabase
-        .from('members')
-        .select('id, full_name, email')
-        .eq('is_active', true)
-        .order('full_name')
-
-      if (error) throw error
-      setMembers(data || [])
+  const res = await fetch('/api/members')
+  if (!res.ok) throw new Error('Failed to fetch members')
+  const data = await res.json()
+  setMembers(data || [])
     } catch (error) {
       console.error('Error fetching members:', error)
     }

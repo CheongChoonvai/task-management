@@ -1,9 +1,7 @@
-'use client'
-
+"use client"
 export const dynamic = 'force-dynamic'
-
 import { useState, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { supabase, updateProjectProgress } from '@/lib/supabase'
 import { useForm } from 'react-hook-form'
@@ -50,8 +48,7 @@ interface ProjectMember {
 export default function CreateTaskPage() {
   const { user } = useAuth()
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const preselectedProject = searchParams.get('project')
+  const [preselectedProject, setPreselectedProject] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [projects, setProjects] = useState<Project[]>([])
   const [currentMember, setCurrentMember] = useState<Member | null>(null)
@@ -82,6 +79,16 @@ export default function CreateTaskPage() {
     }
   }, [user])
 
+  // Read preselected project from URL on client-side to avoid useSearchParams prerender issue
+  useEffect(() => {
+    try {
+      const sp = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '')
+      setPreselectedProject(sp.get('project'))
+    } catch (e) {
+      // ignore
+    }
+  }, [])
+
   // Fetch members for selected project
   useEffect(() => {
     if (selectedProject) {
@@ -93,16 +100,20 @@ export default function CreateTaskPage() {
 
   const fetchProjectMembers = async (projectId: string) => {
     try {
-      const { data, error } = await supabase
-        .from('project_members')
-        .select('member_id, members(full_name, email)')
-        .eq('project_id', projectId)
-      if (error) throw error
+      const res = await fetch(`/api/project-members?projectId=${encodeURIComponent(projectId)}`)
+      if (!res.ok) {
+        const body = await res.text().catch(() => '')
+        console.error('project-members API error', res.status, body)
+        throw new Error(`Failed to fetch project members: ${res.status} ${body}`)
+      }
+  const data = await res.json()
+  console.debug('project-members raw response', data)
       setProjectMembers(data || [])
     } catch (error) {
       console.error('Error fetching project members:', error)
     }
   }
+
 
   // Set preselected project when projects are loaded
   useEffect(() => {
@@ -312,17 +323,31 @@ export default function CreateTaskPage() {
                   <span className="font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>Assign Members</span>
                 </label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {projectMembers.map((pm) => (
-                    <label key={pm.member_id} className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        value={pm.member_id}
-                        {...register('assigned_members')}
-                        className="form-checkbox h-4 w-4 text-primary-600"
-                      />
-                      <span>{pm.members?.[0]?.full_name || pm.members?.[0]?.email}</span>
-                    </label>
-                  ))}
+                  <div className="col-span-1 md:col-span-2">
+                    <div className="border border-gray-200 rounded-md bg-white max-h-48 overflow-auto p-2">
+                      {projectMembers.length === 0 ? (
+                        <p className="text-sm text-gray-500 m-2">No members found for this project.</p>
+                      ) : (
+                        projectMembers.map((pm) => {
+                          const memberObj = Array.isArray(pm.members) ? pm.members[0] : pm.members
+                          const name = memberObj?.full_name || memberObj?.email || 'Unknown'
+                          const id = `assign-${pm.member_id}`
+                          return (
+                            <label key={pm.member_id} htmlFor={id} className="flex items-center space-x-2 p-2 rounded hover:bg-gray-50 cursor-pointer">
+                              <input
+                                id={id}
+                                type="checkbox"
+                                value={pm.member_id}
+                                {...register('assigned_members')}
+                                className="h-4 w-4 text-primary-600 rounded border-gray-300"
+                              />
+                              <span className="ml-2 text-black text-sm truncate">{name}</span>
+                            </label>
+                          )
+                        })
+                      )}
+                    </div>
+                  </div>
                 </div>
                 {errors.assigned_members && (
                   <p className="mt-1 text-sm text-red-600">{errors.assigned_members.message}</p>
