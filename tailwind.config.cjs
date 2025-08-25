@@ -17,6 +17,31 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        // Retro pastel palettes used across the app
+        autumn: {
+          50:  '#fff6f2',
+          100: '#fff0ea',
+          200: '#fbe3d8',
+          300: '#f7cdbf',
+          400: '#f3b39e',
+          500: '#f08a7d',
+          600: '#f06e54',
+          700: '#d9654b',
+          800: '#b8523d',
+          900: '#8f3f2f'
+        },
+        primary: {
+          50:  '#f2eef9',
+          100: '#ebe6f6',
+          200: '#dfd7f0',
+          300: '#c9b9ea',
+          400: '#a991e0',
+          500: '#8b6fd6',
+          600: '#5b3e96',
+          700: '#4a3377',
+          800: '#392658',
+          900: '#281a3a'
+        },
         // Map Tailwind's blue/indigo palettes to your custom teal/green theme
         // This lets existing `bg-blue-600`, `text-blue-600`, `from-blue-600` etc. render
         // with your provided colors without editing component files.

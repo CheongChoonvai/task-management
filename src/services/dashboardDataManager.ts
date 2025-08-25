@@ -1,4 +1,5 @@
-import { supabase } from './supabase'
+import { supabase } from '../lib/supabase'
+import type { Database } from '@/lib/supabase'
 
 interface CacheEntry<T> {
   data: T
@@ -6,53 +7,16 @@ interface CacheEntry<T> {
   ttl: number // time to live in milliseconds
 }
 
-interface Member {
-  id: string
-  email: string
-  full_name: string | null
-  avatar_url: string | null
-  role: string
-  is_active: boolean
-  created_at: string
-  updated_at: string
-}
+type Member = Database['public']['Tables']['members']['Row']
 
-interface Task {
-  id: string
-  title: string
-  description: string | null
-  project_id: string | null
-  status: string
-  priority: string
-  progress: number
-  project_contribution: number
-  created_by: string | null
-  due_date: string | null
-  completed_at: string | null
-  created_at: string
-  updated_at: string
-  project?: {
-    title: string
-    status: string
-  }
+type Task = Database['public']['Tables']['tasks']['Row'] & {
+  project?: { title: string; status: string }
   canComplete?: boolean
   completionReason?: string
   assignedMembers?: string[]
 }
 
-interface Project {
-  id: string
-  title: string
-  description: string | null
-  status: string
-  priority: string
-  progress: number
-  deadline: string | null
-  todostatus: string | null
-  lead_id: string | null
-  budget: number
-  created_at: string
-  updated_at: string
+type Project = Database['public']['Tables']['projects']['Row'] & {
   tasks_count?: number
   completed_tasks?: number
 }
@@ -199,7 +163,7 @@ class DashboardDataManager {
     }
   }
 
-  async getDashboardData(memberId: string): Promise<DashboardData> {
+  async getDashboardData(memberId: string): Promise<DashboardData> {                                        
     const cacheKey = this.getCacheKey('dashboard', { memberId })
     const cached = this.getCache<DashboardData>(cacheKey)
     if (cached) return cached

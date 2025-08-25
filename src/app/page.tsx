@@ -178,7 +178,7 @@ export default function Home() {
       </section>
 
       {/* Features Section - F-pattern: Secondary horizontal scan */}
-      <section id="features" className="py-24 bg-white">
+  <section id="features" className="py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="font-jura text-4xl font-bold text-gray-900 mb-4">
@@ -268,7 +268,7 @@ export default function Home() {
             </div>
             
             <div className="relative">
-              <div className="bg-white rounded-2xl shadow-xl p-8">
+              <div className="bg-gray-50 rounded-2xl shadow-xl p-8">
                 <div className="space-y-4">
                   <div className="h-4 bg-gradient-to-r from-green-500 to-green-600 rounded-full w-3/4"></div>
                   <div className="h-4 bg-gradient-to-r from-primary-500 to-primary-600 rounded-full w-1/2"></div>

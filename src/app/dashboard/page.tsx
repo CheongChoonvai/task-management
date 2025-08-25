@@ -5,11 +5,12 @@ export const dynamic = 'force-dynamic'
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
-import { supabase, updateProjectProgress } from '@/lib/supabase'
-import { dashboardDataManager, type DashboardData, type Task, type Project } from '@/lib/dashboardDataManager'
+import { supabase } from '@/lib/supabase'
+import { updateProjectProgress } from '@/services/projects'
+import { dashboardDataManager, type DashboardData, type Task, type Project } from '@/services/dashboardDataManager'
 import { Plus, LogOut, Clock, CheckCircle, Circle, AlertCircle, TrendingUp, User, Calendar, BarChart3, RefreshCw, AlertTriangle } from 'lucide-react'
 import Link from 'next/link'
-import { getDisplayName, getStatusStyles, getPriorityStyles } from '@/lib/utils'
+import { getDisplayName, getStatusStyles, getPriorityStyles } from '@/services/utils'
 
 // Enhanced state management with clear loading and error states
 interface DashboardState {
@@ -221,10 +222,10 @@ export default function DashboardPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center font-jura">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4 font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>Please sign in</h1>
-          <Link href="/login" className="text-primary-600 hover:text-primary-800 font-jura" style={{ color: 'var(--primary-600, #007f6d)', fontFamily: 'Jura, sans-serif' }}>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4 font-jura">Please sign in</h1>
+          <Link href="/login" className="text-primary-600 hover:text-primary-800 font-jura" style={{ color: 'var(--primary-600, #007f6d)' }}>
             Go to login
           </Link>
         </div>
@@ -233,61 +234,66 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 font-jura">
       {/* Modern Header with Glassmorphism Effect */}
-      <div className="sticky top-0 z-50 backdrop-blur-md bg-white/80 border-b border-gray-200/60 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:justify-between md:items-center py-4 gap-4">
-            <div className="flex items-center space-x-4">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg" style={{ backgroundColor: 'var(--autumn-600, #d4792f)' }}>
-                <BarChart3 className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-autumn-700 font-jura">
-                                  Task Dashboard
-                                </h1>
-                <p className="mt-1 text-sm text-autumn-600 font-medium font-jura">
-                  Welcome back, {getDisplayName(currentMember, user?.email)} 👋
-                </p>
-              </div>
-            </div>
-            <div className="flex flex-wrap items-center gap-3">
-              <Link
-                href="/calendar"
-                className="inline-flex items-center px-4 py-2 text-sm font-medium text-white rounded-lg transition-all duration-200 font-jura border border-autumn-200 hover:bg-autumn-700"
-                style={{ backgroundColor: 'var(--autumn-600, #d4792f)' }}
-              >
-                <Calendar className="w-4 h-4 mr-2" />
-                Calendar
-              </Link>
-              <Link
-                href="/projects"
-                className="inline-flex items-center px-4 py-2 text-sm font-medium text-white rounded-lg transition-all duration-200 font-jura border border-autumn-200 hover:bg-brown-600"
-                style={{ backgroundColor: 'var(--brown-600, #a18072)' }}
-              >
-                <TrendingUp className="w-4 h-4 mr-2" />
-                Projects
-              </Link>
-              <Link
-                href="/tasks/create"
-                className="inline-flex items-center px-4 py-2 text-sm font-medium text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 font-jura hover:bg-orange-600"
-                style={{ backgroundColor: 'var(--orange-600, #ea580c)' }}
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                New Task
-              </Link>
-              <button
-                onClick={handleSignOut}
-                className="inline-flex items-center px-3 py-2 text-sm text-white rounded-lg transition-all duration-200 font-jura hover:bg-autumn-700"
-                style={{ backgroundColor: 'var(--autumn-600, #d4792f)' }}
-              >
-                <LogOut className="w-4 h-4 mr-1" />
-                Sign Out
-              </button>
-            </div>
-          </div>
+ <div className="sticky top-0 z-50 backdrop-blur-xl bg-white/70 border-b border-gray-200/60 shadow-md">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="flex flex-col md:flex-row md:justify-between md:items-center py-4 gap-4">
+      
+      {/* Left Section - Logo + Title */}
+      <div className="flex items-center space-x-4">
+        <div className="w-11 h-11 rounded-xl flex items-center justify-center shadow-md bg-gradient-to-tr from-orange-500 to-autumn-600">
+          <BarChart3 className="w-6 h-6 text-white" />
+        </div>
+        <div>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-autumn-700 font-jura tracking-tight">
+            Task Dashboard
+          </h1>
+          <p className="mt-1 text-sm text-gray-600 font-medium font-jura">
+            Welcome back, {getDisplayName(currentMember, user?.email)} 👋
+          </p>
         </div>
       </div>
+
+      {/* Right Section - Actions */}
+      <div className="flex flex-wrap items-center gap-3">
+        <Link
+          href="/calendar"
+          className="inline-flex items-center px-4 py-2 text-sm font-semibold text-white rounded-xl shadow-sm transition-all duration-200 font-jura border border-orange-100 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 hover:shadow-lg"
+        >
+          <Calendar className="w-4 h-4 mr-2" />
+          Calendar
+        </Link>
+
+        <Link
+          href="/projects"
+          className="inline-flex items-center px-4 py-2 text-sm font-semibold text-white rounded-xl shadow-sm transition-all duration-200 font-jura border border-brown-100 bg-gradient-to-r from-brown-500 to-brown-600 hover:from-brown-600 hover:to-brown-700 hover:shadow-lg"
+        >
+          <TrendingUp className="w-4 h-4 mr-2" />
+          Projects
+        </Link>
+
+        <Link
+          href="/tasks/create"
+          className="inline-flex items-center px-4 py-2 text-sm font-semibold text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 font-jura bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          New Task
+        </Link>
+
+        <button
+          type="button"
+          onClick={handleSignOut}
+          aria-label="Sign out"
+          className="inline-flex items-center px-3 py-2 text-sm font-semibold text-white rounded-xl transition-all duration-200 font-jura bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 shadow-md hover:shadow-lg"
+        >
+          <LogOut className="w-4 h-4 mr-1" />
+          Sign Out
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Error Message with Modern Design */}
@@ -304,8 +310,10 @@ export default function DashboardPage() {
                 <p className="mt-1 text-sm text-red-700">{state.error.message}</p>
               </div>
               <button
+                type="button"
                 onClick={refreshData}
                 disabled={isRefreshing}
+                aria-label="Retry loading dashboard data"
                 className="inline-flex items-center px-4 py-2 bg-white hover:bg-red-50 border border-red-300 rounded-lg text-sm font-medium text-red-700 transition-all duration-200 disabled:opacity-50 shadow-sm"
               >
                 <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
@@ -319,7 +327,7 @@ export default function DashboardPage() {
         {isLoading && (
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-primary-500 to-primary-600 rounded-2xl shadow-lg mb-4">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-primary-500 to-primary-600 rounded-2xl shadow-lg mb-4" role="status" aria-live="polite">
                 <RefreshCw className="animate-spin h-8 w-8 text-white" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Loading Dashboard</h3>
@@ -332,7 +340,7 @@ export default function DashboardPage() {
         {!isLoading && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {/* To Do Tasks Card */}
-            <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden group">
+            <div className="bg-gray-100 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 overflow-hidden group">
               <div className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
@@ -357,7 +365,7 @@ export default function DashboardPage() {
             </div>
 
             {/* In Progress Tasks Card */}
-            <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden group">
+            <div className="bg-gray-100 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 overflow-hidden group">
               <div className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
@@ -382,7 +390,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Completed Tasks Card */}
-            <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden group">
+            <div className="bg-gray-100 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 overflow-hidden group">
               <div className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
@@ -407,7 +415,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Projects Card */}
-            <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden group">
+            <div className="bg-gray-100 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-200 overflow-hidden group">
               <div className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
@@ -432,8 +440,8 @@ export default function DashboardPage() {
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
           {/* Recent Tasks - Modern Card Design */}
-          <div className="xl:col-span-2 bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-            <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-autumn-50 to-autumn-100">
+          <div className="xl:col-span-2 bg-gray-100 rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="px-6 py-5 border-b border-gray-100 bg-gray-100">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--autumn-600, #d4792f)' }}>
@@ -484,15 +492,17 @@ export default function DashboardPage() {
                         <div className="flex items-center space-x-4 flex-1 min-w-0">
                           {/* Task Status Button */}
                           <div className="flex-shrink-0">
-                            {task.status === 'completed' ? (
+              {task.status === 'completed' ? (
                               <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
                                 <CheckCircle className="w-5 h-5 text-green-600" />
                               </div>
                             ) : task.canComplete ? (
                               <button
-                                onClick={() => updateTaskStatus(task.id, 'completed')}
-                                className="w-8 h-8 bg-primary-100 hover:bg-primary-200 rounded-full flex items-center justify-center transition-colors duration-200 group"
-                                title={task.completionReason}
+                type="button"
+                onClick={() => updateTaskStatus(task.id, 'completed')}
+                aria-label={`Mark ${task.title} as completed`}
+                className="w-8 h-8 bg-primary-100 hover:bg-primary-200 rounded-full flex items-center justify-center transition-colors duration-200 group"
+                title={task.completionReason}
                               >
                                 <Circle className="w-5 h-5 text-primary-600 group-hover:text-primary-700" />
                               </button>
@@ -564,11 +574,13 @@ export default function DashboardPage() {
                                 </svg>
                               </Link>
                               <button
+                                type="button"
                                 onClick={() => {
                                   if (confirm('Are you sure you want to delete this task?')) {
                                     deleteTask(task.id)
                                   }
                                 }}
+                                aria-label={`Delete task ${task.title}`}
                                 className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
                               >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -591,8 +603,8 @@ export default function DashboardPage() {
           </div>
 
           {/* Projects Overview - Modern Design */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-            <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+          <div className="bg-gray-100 rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="px-6 py-5 border-b border-gray-100 bg-gray-100">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--primary-600, #007f6d)' }}>

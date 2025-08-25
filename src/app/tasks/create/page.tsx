@@ -3,7 +3,8 @@ export const dynamic = 'force-dynamic'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
-import { supabase, updateProjectProgress } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
+import { updateProjectProgress } from '@/services/projects'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -237,7 +238,7 @@ export default function CreateTaskPage() {
   return (
   <div className="min-h-screen bg-gray-50 font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
       {/* Header */}
-  <div className="bg-surface shadow-sm border-b border-gray-200">
+  <div className="bg-gray-50 shadow-sm border-b border-gray-200">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
           <div className="flex items-center py-6">
             <Link
@@ -324,7 +325,7 @@ export default function CreateTaskPage() {
                 </label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   <div className="col-span-1 md:col-span-2">
-                    <div className="border border-gray-200 rounded-md bg-white max-h-48 overflow-auto p-2">
+                    <div className="border border-gray-200 rounded-md bg-gray-50 max-h-48 overflow-auto p-2">
                       {projectMembers.length === 0 ? (
                         <p className="text-sm text-gray-500 m-2">No members found for this project.</p>
                       ) : (

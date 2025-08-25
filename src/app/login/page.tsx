@@ -30,16 +30,6 @@ export default function LoginPage() {
 
   return (
   <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-50 font-jura">
-      {/* Back to Home */}
-      <div className="absolute top-6 left-6 z-10">
-        <Link
-          href="/"
-          className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors group"
-        >
-          <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
-          Back to Home
-        </Link>
-      </div>
 
       <div className="min-h-screen flex">
         {/* Left Side - Authentication Form */}

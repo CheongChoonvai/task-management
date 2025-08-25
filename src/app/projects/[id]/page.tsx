@@ -5,10 +5,11 @@ export const dynamic = 'force-dynamic'
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
-import { supabase, updateProjectProgress } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
+import { updateProjectProgress } from '@/services/projects'
 import { ArrowLeft, Calendar, User, TrendingUp, DollarSign, Plus, Circle, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
-import { getDisplayName, getStatusStyles, getPriorityStyles } from '@/lib/utils'
+import { getDisplayName, getStatusStyles, getPriorityStyles } from '@/services/utils'
 
 interface Project {
   id: string
@@ -255,9 +256,9 @@ export default function ProjectDetailPage() {
   const totalTasks = tasks.length
 
   return (
-  <div className="min-h-screen bg-gray-50 font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
+  <div className="min-h-screen bg-gray-100 font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
       {/* Header */}
-  <div className="bg-surface shadow-sm border-b border-gray-200">
+  <div className="bg-surface shadow-sm border-b-2 border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between py-6 gap-4">
             <div className="flex flex-col sm:flex-row sm:items-center gap-2">
@@ -279,8 +280,8 @@ export default function ProjectDetailPage() {
             <div className="flex flex-col sm:flex-row gap-2 md:gap-3 w-full md:w-auto">
               <Link
                 href={`/tasks/create?project=${projectId}`}
-                className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-jura rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700"
-                style={{ backgroundColor: 'var(--primary-600, #007f6d)', fontFamily: 'Jura, sans-serif' }}
+                className="inline-flex items-center justify-center px-4 py-2 text-sm font-jura rounded-md shadow-md text-white bg-autumn-600 hover:bg-autumn-700"
+                style={{ backgroundColor: 'var(--autumn-600, #d4792f)', fontFamily: 'Jura, sans-serif' }}
               >
                 <Plus className="w-4 h-4 mr-2 text-white" />
                 Add Task
@@ -292,7 +293,7 @@ export default function ProjectDetailPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Project Overview */}
-  <div className="bg-surface shadow rounded-lg mb-8">
+  <div className="bg-surface shadow rounded-lg mb-8 border-2 border-gray-600">
           <div className="p-6 font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Project Info */}
@@ -361,8 +362,8 @@ export default function ProjectDetailPage() {
         </div>
 
         {/* Tasks */}
-  <div className="bg-surface shadow rounded-lg">
-          <div className="px-6 py-4 border-b border-gray-200 font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
+  <div className="bg-surface shadow rounded-lg border-2 border-gray-600">
+          <div className="px-6 py-4 border-b-2 border-gray-700 font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
             <h3 className="text-lg leading-6 font-medium text-primary-600 font-jura" style={{ color: 'var(--primary-600, #007f6d)', fontFamily: 'Jura, sans-serif' }}>Project Tasks</h3>
           </div>
           <div className="p-6 font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
@@ -385,7 +386,7 @@ export default function ProjectDetailPage() {
             ) : (
               <div className="space-y-4 max-h-96 overflow-y-auto font-jura" style={{ fontFamily: 'Jura, sans-serif' }}>
                 {tasks.map((task) => (
-                  <div key={task.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-primary-50">
+                  <div key={task.id} className="flex items-center justify-between p-4 border-2 border-gray-500 rounded-lg hover:bg-primary-50">
                     <div className="flex items-center space-x-3 flex-1">
                 {task.status === 'completed' ? (
                   <span className="text-sm font-jura font-medium text-green-600 bg-green-100 px-3 py-1 rounded-full">Completed</span>
